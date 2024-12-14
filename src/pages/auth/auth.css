@@ -1,0 +1,156 @@
+.authlogin, .loginContainer, .loginLeft, .loginRight, .leftWrapper,
+.loginrightform, .loginform, .formi, .actualform, .finputs, .inputs,
+.slayer, .sub, .loginbutton, .authRegister, .registerWrapper,
+.registerLeft, .registerRight, .registerrightform, .o{
+    width: 100%;
+    height: 100%;
+}
+
+.loginWrap, .slayer, .registerContainer{
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.appLine{
+    width: 2px;
+    height: 90vh;
+    position: relative;
+    background: hsl(0, 0%, 80%);
+}
+
+.leftWrapper, .loginform, .actualform, .registerform{
+    margin-top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    align-items: center;
+    justify-content: center;
+}
+
+.leftWrapper .leftHeader, .fpassword, .viewpassword, .registerp{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.loginform, .registerform{
+    align-items: start;
+    gap: 30px;
+}
+
+.registerform{
+    margin-top: 0;
+}
+
+.bghead{
+    font-size: 2rem;
+}
+
+.actualform{
+    margin-top: 10px;
+    align-items: start;
+}
+
+.finputs, .inputs, .sub{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputs{
+    gap: 30px;
+}
+
+.o{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.o input{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    border-radius: 6px;
+    outline: none;
+    border: none;
+    background: hsla(0, 0%, 85%, 0.32);
+    color: hsl(0, 0%, 100%);
+    padding: 10px;
+    font-size: 1.2rem;
+    padding-right: 55px;
+}
+
+.inputs label{
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.o i{
+    position: absolute;
+    margin-top: 0px;
+}
+
+.slayer{
+    padding: 0;
+}
+
+.fpassword, .registerp{
+    gap: 10px;
+}
+
+.viewpassword{
+    position: relative;
+    gap: 10px;
+}
+
+.slide label{
+    width: 58px;
+    height: 28px;
+    background: hsla(0, 0%, 85%, 0.32);
+    border: none;
+    border-radius: 30px;
+    transition: all .4s ease;
+    cursor: pointer;
+    display: block;
+    position: relative;
+}
+
+.slide label::after{
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: hsl(241, 97%, 24%);
+    transition: all .4s ease;
+}
+
+.slide input:checked ~ label::after{
+    left: 32px;
+    background: hsl(0, 0%, 100%);
+}
+
+.slide input:checked ~ label{
+    background: hsl(241, 97%, 24%);
+}
+
+.loginbutton button{
+    width: 100%;
+    height: 50px;
+    background: hsla(241, 97%, 24%, 0.755);
+    color: hsla(0, 0%, 100%);
+    font-size: 1.2rem;
+    border: none;
+    transition: .4s ease;
+}
+
+.loginbutton button:hover{
+    background: hsla(241, 97%, 24%, 0.586);
+}

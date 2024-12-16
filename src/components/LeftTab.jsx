@@ -49,5 +49,5 @@ export const LeftTab = ({ setCurrentView }) => {
 }
 
 LeftTab.propTypes = {
-    setCurrentView: PropTypes.string.isRequired
+    setCurrentView: PropTypes.func.isRequired
 }

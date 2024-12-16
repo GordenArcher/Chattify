@@ -1,11 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '../../assets/css/mainview.css';
 import EmojiPicker from 'emoji-picker-react';
+import PropTypes from 'prop-types';
 
-export const MainViewChat = () => {
+export const MainViewChat = ({ currentChatView }) => {
   const [message, setMessage] = useState("")
+  const [messages, setMessages] = useState([])
   const [showPicker, setShowPicker] = useState(false);
+  const websocket = useRef(null)
 
+    const CHAT_BASE_URL = "localhost:8000"
+
+    websocket.current = new WebSocket(`ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}/`)
+
+    websocket.current.onopen = () => {
+      console.log("websockets opened")
+    }
+
+    websocket.current.onerror = (Error) => {
+      console.log("error", Error)
+    }
+
+    websocket.current.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setMessages((prevMessages) => [...prevMessages, data]);
+        console.log("incoming message", data);
+      } catch (error) {
+        console.error("Error parsing message data", error);
+      }
+    }
+
+    websocket.current.onclose = () => {
+      console.log("Websocket closed")
+    }
+    
+
+    const sendMessages = () => {
+      websocket.current.send(JSON.stringify({ message: message}))
+      setMessage("")
+    }
 
   const togglePicker = () => {
     setShowPicker((prev) => !prev);
@@ -37,6 +71,16 @@ export const MainViewChat = () => {
             <div className="chatview">
               <div className="incoming">
                 <div className="cm">
+                  {messages.length > 0 ? (
+                    (messages.map((msg, index) => {
+                      return (
+                        <div key={index}>{msg.message}</div>
+                      )
+                    }))
+                  ) : (
+                    <div>NONe</div>
+                  )
+                }
                 
                 </div>
               </div>
@@ -75,13 +119,11 @@ export const MainViewChat = () => {
                     />
                   </div>
 
-                  {message && (
                     <div className="send">
-                      <button type="submit">
+                      <button type="submit" onClick={sendMessages}>
                         <i className="bi bi-send"></i>
                       </button>
                     </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -97,3 +139,7 @@ export const MainViewChat = () => {
     </div>
   );
 };
+
+MainViewChat.propType = {
+  currentChatView: PropTypes.func.isRequired
+}

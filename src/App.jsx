@@ -11,7 +11,6 @@ import { AuthContext } from './utils/contexts/AuthContextProvider';
 function App() {
 
   const { token } = useContext(AuthContext)
-  console.log(token || "Nothing here")
 
   return (
     <>

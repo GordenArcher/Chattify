@@ -1,8 +1,17 @@
-import ProfilePic from '../../assets/images/avatar-7.png'
+
 import '../../assets/CSS/chatbox.css'
-import PropType from 'prop-types'
+import PropTypes from 'prop-types'
+import { FetchUsers } from '../../utils/hooks/FetchUsers'
+import UserCard from '../../components/userCard'
+import FriendLoad from '../../components/FriendLoad'
 
 export const Leftbox = ({ setCurrentChatView }) => {
+
+    const {usersData, loading, error} = FetchUsers()
+
+    const refresh = () => {
+        location.reload()
+    }
   return (
     <div className="leftChatbox">
         <div className="leftchatboxwrap">
@@ -21,104 +30,44 @@ export const Leftbox = ({ setCurrentChatView }) => {
 
             <div className="listfriends">
                 <div className="lists">
-                    <div className="listswrap">
-                        <div className="liscontainer">
-                            <div className="friendProfile">
-                                <img src={ProfilePic} alt="user profile" />
-                            </div>
+                    {error ? 
+                        (
+                            <div className='errorFri'>
+                                <h2>Error</h2>
+                                <p>Please click the button to  refresh</p>
 
-                            <div className="leftmessoverview">
-                                <div className="over">
-                                    <div className="friendname">
-                                        <h3>Nii-Armar</h3>
-                                    </div>
-
-                                    <div className="messageOverview">
-                                        <div className="vieww">
-                                            <span>How you doing man</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="messTime">
-                                    <div className="Timeset">
-                                        <p>01 : 35</p>
-                                    </div>
-
-                                    <div className="messNum">
-                                        <div className="numcount">
-                                            <span>5</span>
-                                        </div>
-                                    </div>
+                                <div className='err_re_bu'>
+                                    <button onClick={refresh}>
+                                        <span>Refresh</span>
+                                        <span>
+                                            <i className='bi bi-arrow-repeat'></i>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
+                        ) 
+                        : (
+                        (loading ? (
+                            <FriendLoad />
+                        ) : (
+                        <div className="listswrap">
+                            {usersData.length > 0 ? (
+                                (usersData.map((friend) => {
+                                    return (
+                                        <UserCard friends={friend} setCurrentChatView={setCurrentChatView} key={friend.id} />
+                                    );
+                                }))
+                            ) : (
+                                <div>
+                                    No Friends 
+                                </div>
+                            )}
+                                
                         </div>
-
-                        <div className="liscontainer">
-                            <div className="friendProfile">
-                                <img src={ProfilePic} alt="user profile" />
-                            </div>
-
-                            <div className="leftmessoverview">
-                                <div className="over">
-                                    <div className="friendname">
-                                        <h3>Nii-Armar</h3>
-                                    </div>
-
-                                    <div className="messageOverview">
-                                        <div className="vieww">
-                                            <span>How you doing man</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="messTime">
-                                    <div className="Timeset">
-                                        <p>01:35</p>
-                                    </div>
-
-                                    <div className="messNum">
-                                        <div className="numcount">
-                                            <span>5</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="liscontainer">
-                            <div className="friendProfile">
-                                <img src={ProfilePic} alt="user profile" />
-                            </div>
-
-                            <div className="leftmessoverview">
-                                <div className="over">
-                                    <div className="friendname">
-                                        <h3>Nii-Armar</h3>
-                                    </div>
-
-                                    <div className="messageOverview">
-                                        <div className="vieww">
-                                            <span>How you doing man</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="messTime">
-                                    <div className="Timeset">
-                                        <p>01 : 35</p>
-                                    </div>
-
-                                    <div className="messNum">
-                                        <div className="numcount">
-                                            <span>5</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>  
-                        
-                    </div>
+                        ))
+                    )}
+                    
+                    
                 </div>
             </div>
         </div>
@@ -126,6 +75,6 @@ export const Leftbox = ({ setCurrentChatView }) => {
   )
 }
 
-Leftbox.prototypes = {
-    setCurrentChatView: PropType.bool.isRequired
+Leftbox.propTypes = {
+    setCurrentChatView: PropTypes.func.isRequired
 }

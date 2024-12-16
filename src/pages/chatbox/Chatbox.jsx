@@ -11,7 +11,7 @@ import Selected from "../../components/!Selected"
 export const Chatbox = () => {
 
     const [currentView, setCurrentView] = useState("chat");
-    const [currentChatView, setCurrentChatView] = useState(false)
+    const [currentChatView, setCurrentChatView] = useState("")
 
   return (
     <div className="chatbox">
@@ -32,11 +32,11 @@ export const Chatbox = () => {
 
                 <div className="viewchat">
                     {
-                    currentChatView ?
-                    
-                      (<MainViewChat />)
-                      : 
-                      (<Selected />)
+                    currentChatView === "" ?
+                        (<Selected />)
+                        :
+                      (<MainViewChat currentChatView={currentChatView} />)
+                      
                     }
                     
                 </div>

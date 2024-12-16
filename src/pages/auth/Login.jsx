@@ -5,13 +5,12 @@ import { useContext, useState } from 'react'
 import {toast} from 'react-toastify';
 import { Loader } from '../../components/Loader'
 import { AuthContext } from '../../utils/contexts/AuthContextProvider';
-// import axios from 'axios'
 
 export const Login = () => {
     
     const [viewPassword, setViewPassword] = useState(false)
     const [loader, setLoader] = useState(false)
-    const { saveToken } = useContext(AuthContext)
+    const { saveToken, saveUsername } = useContext(AuthContext)
 
     const navigate = useNavigate()
 
@@ -46,7 +45,7 @@ export const Login = () => {
             const response = await fetch(loginApiUrl, {
                 method:"POST",
                 headers: {
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
                 },
                 body: JSON.stringify({
                     username : LoginData.username,
@@ -61,6 +60,7 @@ export const Login = () => {
                 setLoader(false)
                 toast.success(data.message);
                 saveToken(data.token)
+                saveUsername(data.payload.username)
                 setTimeout(() => {
                     navigate('/chat')
                 }, 2000)    

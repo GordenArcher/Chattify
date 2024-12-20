@@ -1,11 +1,16 @@
 import PropTypes from "prop-types"
-import ProfilePic from '../assets/images/avatar-7.png'
+import { useRef } from "react"
 
-const UserCard = ({ friends, setCurrentChatView }) => {
+const UserCard = ({ friends, setCurrentChatView, searchFriends }) => {
+    const display = useRef(null)
+    
+    const isFriendVisible = searchFriends.includes(friends.username);
+
   return (
-    <div className="liscontainer" onClick={() => setCurrentChatView(`${friends.username}`)}>
+    <div className="liscontainer" ref={display} style={{ display: isFriendVisible ? "none" : "flex" }} onClick={() => setCurrentChatView(`${friends.username}`)}>
         <div className="friendProfile">
-            <img src={ProfilePic} alt="user profile" />
+            {/* <img src={ProfilePic} alt="user profile" /> */}
+            <div className="profile_name">{friends.username.charAt(0).toUpperCase()}</div>
         </div>
 
         <div className="leftmessoverview">
@@ -40,7 +45,8 @@ const UserCard = ({ friends, setCurrentChatView }) => {
 export default UserCard
 
 UserCard.propTypes = {
-    setCurrentChatView: PropTypes.func.isRequired,  
+    setCurrentChatView: PropTypes.func.isRequired, 
+    searchFriends : PropTypes.string.isRequired, 
     friends: PropTypes.shape({ 
         id: PropTypes.number.isRequired,
         username: PropTypes.string.isRequired,

@@ -34,7 +34,7 @@
     margin-top: 30px;
   }
   
-  .settingsicon button, .chaticon button, .profileimage img, .addfriendicon button{
+  .settingsicon button, .chaticon button, .profileimage img, .addfriendicon button, .no_profile_i{
     width: 45px;
     height: 45px;
     border: none;
@@ -47,6 +47,7 @@
   
   .profileimage img{
     border: 1px solid hsl(0, 0%, 100%);
+    object-fit: cover;
   }
   
   .settingsicon button:hover, .chaticon button:hover, .addfriendicon button:hover{
@@ -60,3 +61,36 @@
     font-size: 1.3rem;
     color: hsl(0, 0%, 100%);
   }
+
+
+
+.subSpin {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 4px solid hsl(0, 0%, 0%);
+  border-right: 4px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+.subSpin::after {
+  content: '';  
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border-bottom: 4px solid hsl(208, 95%, 8%);
+  border-left: 4px solid transparent;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 

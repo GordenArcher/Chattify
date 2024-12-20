@@ -1,12 +1,118 @@
 .userchat, .userchatcontainer, .chatcontent, .mainchatview, 
 .chatview, .messagecontent, .no_chat_selected, .no-select-wrap, .no-container,
-.errorFri{
+.errorFri, .h_banner, .friend_banner_details{
     width: 100%;
     height: 100%;
 }
 
 .no-select-wrap{
     padding: 40px;
+}
+
+.chat_banner{
+    padding: 20px;
+    background: hsla(0, 0%, 85%, 0.09);
+}
+
+.friend_banner_details{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.h_banner_u, .banner_del{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.banner_image_profile, .banner_del{
+    padding: 10px;
+    position: relative;
+}
+
+.banner_image_profile .no_profile{
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 1px solid hsla(0, 0%, 85%, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.h_user_details, .online_status, .chat_user_actions{
+    position: relative;
+}
+
+.banner_username{
+    display: flex;
+    flex-direction: column;
+}
+
+.b_u_name{
+    text-transform: capitalize;
+    font-size: 1.2rem;
+}
+
+.state{
+    font-size: .9rem;
+}
+
+.ud button{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    transition: .3s ease;
+    background: transparent;
+}
+
+.ud button span i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: hsl(0, 0%, 100%);
+}
+
+.ud button:hover{
+    background: hsla(0, 0%, 100%, 0.105);
+    border: none;
+}
+
+.banner_actions_children{
+    position: absolute;
+    margin-left: -150px;
+    width: 200px;
+    background: hsla(0, 0%, 100%, 0.378);
+    border-radius: 3px;
+    z-index: 9;
+}
+
+.actions_children{
+    padding: 20px;
+}
+
+.actions_children ul{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.actions_children ul li{
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 10px;
+    transition: .3s ease;
+}
+
+.actions_children ul li:hover{
+    background: hsla(0, 0%, 80%, 0.42);
 }
 
 .no-container, .errorFri{
@@ -24,6 +130,10 @@
 .chatcontent, .mainchatview{
     display: flex;
     flex-direction: column;
+}
+
+.chatcontent{
+    gap: 20px;
 }
 
 .mainchatview{

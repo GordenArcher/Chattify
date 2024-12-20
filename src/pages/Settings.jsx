@@ -1,5 +1,6 @@
 import { useContext } from "react"
 import { AuthContext } from "../utils/contexts/AuthContextProvider"
+import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 
 export const Settings = () => {
@@ -15,6 +16,7 @@ export const Settings = () => {
     if(response.ok){
       const data = await response.json()
       console.log(data)
+      toast.success(data.message)
       logout()
       navigate("/")
     }else{

@@ -4,10 +4,12 @@ import PropTypes from 'prop-types'
 import { FetchUsers } from '../../utils/hooks/FetchUsers'
 import UserCard from '../../components/userCard'
 import FriendLoad from '../../components/FriendLoad'
+import { useState } from 'react'
 
 export const Leftbox = ({ setCurrentChatView }) => {
 
     const {usersData, loading, error} = FetchUsers()
+    const [searchFriends, setSearchFriends] = useState("")
 
     const refresh = () => {
         location.reload()
@@ -22,7 +24,14 @@ export const Leftbox = ({ setCurrentChatView }) => {
 
                 <div className="leftsearchlist">
                     <div className="searchlistfriends">
-                        <input type='text' id="search" name="search" placeholder="Search" />
+                        <input 
+                        type='text' 
+                        value={searchFriends} 
+                        id="search" 
+                        name="search" 
+                        onChange={(e) => setSearchFriends(e.target.value)}
+                        placeholder="Search" 
+                        />
                         <i className='bi bi-search'></i>
                     </div>
                 </div>
@@ -54,7 +63,7 @@ export const Leftbox = ({ setCurrentChatView }) => {
                             {usersData.length > 0 ? (
                                 (usersData.map((friend) => {
                                     return (
-                                        <UserCard friends={friend} setCurrentChatView={setCurrentChatView} key={friend.id} />
+                                        <UserCard searchFriends={searchFriends} friends={friend} setCurrentChatView={setCurrentChatView} key={friend.id} />
                                     );
                                 }))
                             ) : (

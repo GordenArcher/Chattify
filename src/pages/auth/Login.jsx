@@ -10,7 +10,7 @@ export const Login = () => {
     
     const [viewPassword, setViewPassword] = useState(false)
     const [loader, setLoader] = useState(false)
-    const { saveToken, saveUsername } = useContext(AuthContext)
+    const { saveToken } = useContext(AuthContext)
 
     const navigate = useNavigate()
 
@@ -56,11 +56,9 @@ export const Login = () => {
             if(response.ok){
                 const data = await response.json()
                 if(data.status === 'success'){
-                console.log(data)
                 setLoader(false)
                 toast.success(data.message);
                 saveToken(data.token)
-                saveUsername(data.payload.username)
                 setTimeout(() => {
                     navigate('/chat')
                 }, 2000)    

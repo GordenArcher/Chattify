@@ -35,7 +35,7 @@ export const Chatbox = () => {
                     currentChatView === "" ?
                         (<Selected />)
                         :
-                      (<MainViewChat currentChatView={currentChatView} />)
+                      (<MainViewChat setCurrentChatView={setCurrentChatView} currentChatView={currentChatView} />)
                       
                     }
                     

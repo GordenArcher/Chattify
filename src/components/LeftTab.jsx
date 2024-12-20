@@ -1,10 +1,11 @@
-import ProfileImg from '../assets/images/avatar-7.png'
 import '../App.css'
 import PropTypes from 'prop-types'
+import { GetUserProfile } from '../utils/hooks/GetProfile'
 
 export const LeftTab = ({ setCurrentView }) => {
 
-        
+        const {usersData, usersDataDet} = GetUserProfile()
+
   return (
     <div className='tab'>
         <div className="flow">
@@ -39,7 +40,12 @@ export const LeftTab = ({ setCurrentView }) => {
 
                 <div className="profile">
                     <div className="profileimage" onClick={() => setCurrentView("profile")}>
-                        <img src={ProfileImg} alt="user profile" />
+                        {usersData.payload?.profile_picture ? (
+                            <img src={`http://localhost:8000${usersData.payload.profile_picture}`} alt="user profile" />
+                        ) : (
+                            <div className='no_profile_i i'>{ usersDataDet.charAt(0).toUpperCase() }</div>
+                        )}
+                        
                     </div>
                 </div>
             </div>

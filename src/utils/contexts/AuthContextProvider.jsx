@@ -1,17 +1,15 @@
 import PropTypes from 'prop-types'
 import { createContext, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export const AuthContext = createContext()
 
 export const AuthContextProvider = ({children}) => {
-    const [token, setToken] = useState("")
-    const [username, setUsername] = useState("")
+    const [token, setToken] = useState("") 
+    const navigate = useNavigate()
 
     useEffect(() => {
         const getuser = localStorage.getItem("token")
-        const getusename = localStorage.getItem("u")
-
-        if (getusename) setUsername(getusename.trim().toLowerCase());
 
         if(getuser){
             setToken(getuser)
@@ -23,17 +21,13 @@ export const AuthContextProvider = ({children}) => {
         setToken(userToken)
     }
 
-    const saveUsername = (userN) => {
-        localStorage.setItem("u", userN)
-    }
-
     const logout = () => {
         localStorage.clear()
+        navigate("/")
     }
 
-
   return (
-    <AuthContext.Provider value={{saveToken, token, logout, saveUsername, username}}>
+    <AuthContext.Provider value={{saveToken, token, logout}}>
         {children}
     </AuthContext.Provider>
   )

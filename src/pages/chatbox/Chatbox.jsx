@@ -11,7 +11,8 @@ import Selected from "../../components/!Selected"
 export const Chatbox = () => {
 
     const [currentView, setCurrentView] = useState("chat");
-    const [currentChatView, setCurrentChatView] = useState("")
+    const [currentChatView, setCurrentChatView] = useState("");
+    const [incomingMessage, setIncomingMessage] = useState({});
 
   return (
     <div className="chatbox">
@@ -23,7 +24,7 @@ export const Chatbox = () => {
 
                 <div className="leftbox">
                     <div className="content">
-                        {currentView === "chat" && <Leftbox setCurrentChatView={setCurrentChatView} />}
+                        {currentView === "chat" && <Leftbox incomingMessage={incomingMessage} setCurrentChatView={setCurrentChatView} />}
                         {currentView === "settings" && <Settings />}
                         {currentView === "find_friends" && <FindFrinds />}
                         {currentView === "profile" && <Profile />}
@@ -32,10 +33,16 @@ export const Chatbox = () => {
 
                 <div className="viewchat">
                     {
-                    currentChatView === "" ?
+                        currentChatView === "" ?
                         (<Selected />)
                         :
-                      (<MainViewChat setCurrentChatView={setCurrentChatView} currentChatView={currentChatView} />)
+                        (
+                            <MainViewChat 
+                                setCurrentChatView={setCurrentChatView} 
+                                currentChatView={currentChatView} 
+                                setIncomingMessage={setIncomingMessage}
+                            />
+                        )
                       
                     }
                     

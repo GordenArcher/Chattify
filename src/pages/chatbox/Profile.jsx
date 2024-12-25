@@ -6,7 +6,7 @@ import { AuthContext } from "../../utils/contexts/AuthContextProvider"
 
 const Profile = () => {
 
-  const { usersData, loading, usersDataDet } = GetUserProfile()
+  const { user, loading, usersDataDet } = GetUserProfile()
   const [isEditing, setIsEditing] = useState(false)
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [isEditingEmail, setIsEditingEmail] = useState(false)
@@ -15,7 +15,7 @@ const Profile = () => {
   const { token } = useContext(AuthContext)
   const point = useRef(null)
   const [profileData, setProfileData] = useState({
-    bio: usersData.payload?.bio,
+    bio: user.payload?.bio,
     profile_picture : null,
     cover_picture : null
   })
@@ -83,8 +83,8 @@ formData.append("bio", profileData.bio)
 
                     )
                     : (
-                      (usersData.payload?.cover_picture ? (
-                      <img src={`http://localhost:8000${usersData.payload?.cover_picture}`} alt="User" />
+                      (user.profile?.cover_picture ? (
+                      <img src={`http://localhost:8000${user.profile?.cover_picture}`} alt="User" />
                     ) : (
                       <div className="no_cover">No Cover Image</div>
                     ))
@@ -100,8 +100,8 @@ formData.append("bio", profileData.bio)
 
                     )
                     : (
-                      (usersData.payload?.profile_picture ? (
-                      <img src={`http://localhost:8000${usersData.payload?.profile_picture}`} alt="User" />
+                      (user.profile?.profile_picture ? (
+                      <img src={`http://localhost:8000${user.profile?.profile_picture}`} alt="User" />
                     ) : (
                       <div className="no_profile i">{usersDataDet.charAt(0).toUpperCase()}</div>
                     ))
@@ -123,7 +123,7 @@ formData.append("bio", profileData.bio)
                             <div className="set_bio">
                               <div className="set_bio_cont">
                                 <div className="set_bio_input">
-                                  <textarea onChange={(e) => setProfileData((currentState) => ({...currentState, bio: e.target.value}))} name="bio" id="bio" aria-description="this the area for the user's to enter their bio" aria-label="user's bio" value={usersData.payload?.bio}></textarea>
+                                  <textarea onChange={(e) => setProfileData((currentState) => ({...currentState, bio: e.target.value}))} name="bio" id="bio" aria-description="this the area for the user's to enter their bio" aria-label="user's bio" value={user.profile?.bio}></textarea>
                                 </div>
 
                                 <div className="set_bio_button op">
@@ -141,7 +141,7 @@ formData.append("bio", profileData.bio)
                               ) : (
                                 <>
                                 <span>Bio</span>
-                                <h3>{usersData.payload?.bio ? usersData.payload?.bio : `Hello there, I'm ${usersDataDet}`}</h3>
+                                <h3>{user.profile?.bio ? user.profile?.bio : `Hello there, I'm ${usersDataDet}`}</h3>
                                 </>
                               )}
                             </div>
@@ -164,7 +164,7 @@ formData.append("bio", profileData.bio)
                         <div className="set_username">
                           <div className="se_us_name">
                             <div className="s_username_f">
-                              <input type="text" name="username" id="username" value={usersData.username} onChange={(e) => setIsEditingUsername(e.target.value)} />
+                              <input type="text" name="username" id="username" value={user.username} onChange={(e) => setIsEditingUsername(e.target.value)} />
                             </div>
 
                             <div className="set_username_button op">
@@ -177,7 +177,7 @@ formData.append("bio", profileData.bio)
                         <div className="u_username rt">
                           <div className="s_usern h">
                             <span>Username</span>
-                            <h3>{usersData.username}</h3>
+                            <h3>{user.username}</h3>
                           </div>
 
                           <div className="edit_b">
@@ -197,7 +197,7 @@ formData.append("bio", profileData.bio)
                         <div className="set_email">
                           <div className="se_us_mail">
                             <div className="s_email_f">
-                              <input type="text" name="email" id="email" value={usersData.email} onChange={(e) => setIsEditingEmail(e.target.value)} />
+                              <input type="text" name="email" id="email" value={user.email} onChange={(e) => setIsEditingEmail(e.target.value)} />
                             </div>
 
                             <div className="set_email_button op">
@@ -210,7 +210,7 @@ formData.append("bio", profileData.bio)
                         <div className="user_email rt">
                           <div className="_user_email h">
                             <span>Email</span>
-                            <h3>{usersData.email ? usersData.email : (<div className="no_user_email"><span>No Email</span></div>)}</h3>
+                            <h3>{user.email ? user.email : (<div className="no_user_email"><span>No Email</span></div>)}</h3>
                           </div>
 
                           <div className="edit_b">

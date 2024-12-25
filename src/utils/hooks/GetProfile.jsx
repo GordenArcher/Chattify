@@ -19,7 +19,7 @@ export const GetUserProfile = () => {
             try {
                 const response = await axios.get(url, {headers: {"Authorization":`Token ${token}`}})
                 if (response.data.status === 'success') {
-                  setusersData(response.data);
+                    setusersData(response.data);
                     setusersDataDet(response.data.username)
                     setIsLoading(false)  
                 }
@@ -42,5 +42,5 @@ export const GetUserProfile = () => {
     }, [token])
 
 
-  return {usersData, loading, error, usersDataDet}
+  return {user: usersData, loading, error, usersDataDet}
 }

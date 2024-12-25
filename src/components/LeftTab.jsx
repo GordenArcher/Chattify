@@ -4,7 +4,7 @@ import { GetUserProfile } from '../utils/hooks/GetProfile'
 
 export const LeftTab = ({ setCurrentView }) => {
 
-        const {usersData, usersDataDet} = GetUserProfile()
+    const {user, usersDataDet} = GetUserProfile()
 
   return (
     <div className='tab'>
@@ -40,8 +40,8 @@ export const LeftTab = ({ setCurrentView }) => {
 
                 <div className="profile">
                     <div className="profileimage" onClick={() => setCurrentView("profile")}>
-                        {usersData.payload?.profile_picture ? (
-                            <img src={`http://localhost:8000${usersData.payload.profile_picture}`} alt="user profile" />
+                        {user.payload?.profile_picture ? (
+                            <img src={`http://localhost:8000${user.payload?.profile_picture}`} alt="user profile" />
                         ) : (
                             <div className='no_profile_i i'>{ usersDataDet.charAt(0).toUpperCase() }</div>
                         )}

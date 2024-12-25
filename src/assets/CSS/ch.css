@@ -1,0 +1,82 @@
+.friend_info_data, .conta, .firnd_iii{
+    width: 100%;
+    height: 100%;
+}
+
+.close_state{
+    position: absolute;
+    right: 9px;
+    top: 10px;
+    z-index: 2;
+}
+
+.close_state button{
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s ease;
+}
+
+.close_state button i{
+    font-size: 1.5rem;
+}
+
+.close_state button:hover{
+    border: 1px solid hsla(0, 0%, 100%, 0.055);
+}
+
+.info_wrap_chat_data{
+    padding: 40px;
+}
+
+.conta, .firnd_iii, .friend_n_bi{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.friend_n_bi{
+    gap: 5px;
+}
+
+.info_profile_picture, .friend_del_ob{
+    position: relative;
+}
+
+.friend_profile{
+    margin: 0 auto;
+}
+
+.friend_profile img, .friend_profile .i{
+    width: 130px;
+    height: 130px;
+}
+
+.friend_profile .i{
+    font-size: 3rem;
+}
+
+.friend_n_bi{
+    padding: 10px;
+}
+
+.f_nameei span{
+    line-height: 2;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.f_oib{
+    line-height: 2;
+    font-size: 1rem;
+    color: hsla(0, 0%, 100%, 0.361);
+}
+
+.n{
+    text-transform: capitalize;
+}

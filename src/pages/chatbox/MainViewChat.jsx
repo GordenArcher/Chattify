@@ -1,16 +1,57 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import '../../assets/css/mainview.css';
+import '../../assets/CSS/ch.css'
 import EmojiPicker from 'emoji-picker-react';
 import PropTypes from 'prop-types';
 import { AuthContext } from '../../utils/contexts/AuthContextProvider';
+import FriendInfo from '../../components/FriendInfo';
+import { U } from '../../utils/hooks/FetchUsers';
 
-export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
+export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingMessage }) => {
   const [message, setMessage] = useState("")
+  const [status, setStatus] = useState("")
   const [messages, setMessages] = useState([])
   const [showPicker, setShowPicker] = useState(false);
+  const [showFriendInfo, setShowFriendInfo] = useState(false);
   const websocket = useRef(null)
   const { token } = useContext(AuthContext)
   const [showOptions, setShowOptions] = useState(false)
+  const {data, loading} = U(currentChatView)
+  const [friendProfile, setFriendProfile] = useState({})
+  const [chatMessages, setChatMessages] = useState([])
+  // console.log(chatMessages)
+
+  useEffect(() => {
+
+    setFriendProfile(data.profile)
+    setChatMessages(data.messages)
+
+  }, [data.profile, data.messages])
+
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+}, []);
+
+const showNotification = (sender, message) => {
+  if (Notification.permission === "granted") {
+      new Notification(`New message from ${sender}`, {
+          body: message,
+          // icon: "/static/images/notification_icon.png",÷\
+      });
+  } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+              new Notification(`New message from ${sender}`, {
+                  body: message,
+                  // icon: "/static/images/notification_icon.png",
+              });
+          }
+      });
+  }
+}
+
 
     const CHAT_BASE_URL = "localhost:8000"
 
@@ -27,8 +68,29 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
     websocket.current.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data);
-        setMessages((prevMessages) => [...prevMessages, data]);
-        console.log("incoming message", data);
+
+          setMessages((prevMessages) => [...prevMessages, data]);
+          setIncomingMessage(data)
+
+          if(document.hasFocus()){
+            showNotification(data.sender, data.message);
+          }
+
+          if(Notification.permission === 'granted'){
+          const notification = new Notification(data.username, 
+            {
+              body: data.message,
+            }
+          )
+
+          notification.onclick = () => {
+            window.focus()
+            open(data.username)
+          }
+        }
+        
+          console.log("incoming message", data);
+        
       } catch (error) {
         console.error("Error parsing message data", error);
       }
@@ -52,17 +114,49 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
     setMessage((prev) => prev + emoji.emoji);
   };
 
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setShowPicker(false);
-    };
+  // useEffect(() => {
+  //   const checkInternetConnection = async () => {
+  //     try {
+  //       const response = await fetch("https://www.google.com", { mode: "no-cors" });
+  //       console.log(response)
+  //       if (response.ok || response.type === "opaque") {
+  //         setStatus("Online");
+  //       }
+  //     } catch {
+  //       setStatus("Offline");
+  //     }
+  //   };
+    
 
-    document.addEventListener("click", handleClickOutside);
+  //   document.addEventListener("click", checkInternetConnection);
+
+  //   return () => {
+  //     document.removeEventListener("click", checkInternetConnection);
+  //   };
+  // }, []);
+
+
+
+  useEffect(() => {
+
+    const chectOnlineStatus = () => {
+      if(navigator.onLine){
+        setStatus("Online")
+        console.log("Online...")
+      }else{
+        console.log("Offline")
+        setStatus("Offline")
+      }
+    } 
+
+    window.addEventListener("online", chectOnlineStatus)
+    window.addEventListener("offline", chectOnlineStatus);
 
     return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
+      window.removeEventListener("online", chectOnlineStatus)
+      window.addEventListener("offline", chectOnlineStatus);
+    }
+  }, [])
   
 
   return (
@@ -74,7 +168,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
               <div className="h_banner">
                 <div className="friend_banner_details">
                   <div className="banner_user_details">
-                  <div className="h_banner_u">
+                  <div className="h_banner_u" onClick={() => setShowFriendInfo(true)}>
                     <div className="banner_image_profile">
                       <div className='no_profile'>
                         {currentChatView.charAt(0).toUpperCase()}
@@ -88,7 +182,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
 
                           <div className="online_status">
                             <div className="state">
-                              <span>online</span>
+                              <span>{status}</span>
                             </div>
                           </div>
                       </div>
@@ -107,7 +201,9 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
                     </div>
                     <div className="chat_user_actions">
                       <div className="actions ud">
-                        <button onClick={() => setShowOptions((currentOption) => !currentOption)}>
+                        <button onClick={(e) => {
+                          setShowOptions((currentOption) => !currentOption)
+                          e.stopPropagation()}}>
                             <span>
                               <i className='bi bi-three-dots-vertical'></i>
                             </span>
@@ -118,7 +214,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
                         <div className="banner_actions_children">
                           <div className="actions_children">
                             <ul>
-                              <li>
+                              <li onClick={() => setShowFriendInfo((currentState) => !currentState)}>
                                 <div className='children_item'>
                                   <div className="view_friend_info bf">
                                     <p>Friend Info</p>
@@ -213,11 +309,19 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView }) => {
           </div>
         </div>
       </div>
+      {
+        showFriendInfo &&
+       <div className='side'>
+          <FriendInfo f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
+       </div>
+      }
+      
     </div>
   );
 };
 
 MainViewChat.propTypes = {
   currentChatView: PropTypes.string.isRequired,  
-  setCurrentChatView : PropTypes.string.isRequired, 
+  setCurrentChatView : PropTypes.func.isRequired,
+  setIncomingMessage: PropTypes.func
 }

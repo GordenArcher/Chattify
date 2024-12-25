@@ -9,7 +9,7 @@ import { useContext } from 'react';
 import { AuthContext } from './utils/contexts/AuthContextProvider';
 
 function App() {
-
+  
   const { token } = useContext(AuthContext)
 
   return (

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 export const AuthContext = createContext()
 
 export const AuthContextProvider = ({children}) => {
-    const [token, setToken] = useState("") 
+    const [token, setToken] = useState("")
     const navigate = useNavigate()
 
     useEffect(() => {

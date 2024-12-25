@@ -6,10 +6,11 @@ import UserCard from '../../components/userCard'
 import FriendLoad from '../../components/FriendLoad'
 import { useState } from 'react'
 
-export const Leftbox = ({ setCurrentChatView }) => {
+export const Leftbox = ({ setCurrentChatView, incomingMessage }) => {
 
     const {usersData, loading, error} = FetchUsers()
     const [searchFriends, setSearchFriends] = useState("")
+
 
     const refresh = () => {
         location.reload()
@@ -28,6 +29,7 @@ export const Leftbox = ({ setCurrentChatView }) => {
                         type='text' 
                         value={searchFriends} 
                         id="search" 
+                        list={usersData.username}
                         name="search" 
                         onChange={(e) => setSearchFriends(e.target.value)}
                         placeholder="Search" 
@@ -63,7 +65,7 @@ export const Leftbox = ({ setCurrentChatView }) => {
                             {usersData.length > 0 ? (
                                 (usersData.map((friend) => {
                                     return (
-                                        <UserCard searchFriends={searchFriends} friends={friend} setCurrentChatView={setCurrentChatView} key={friend.id} />
+                                        <UserCard incomingMessage={incomingMessage} searchFriends={searchFriends} friends={friend} setCurrentChatView={setCurrentChatView} key={friend.id} />
                                     );
                                 }))
                             ) : (
@@ -71,7 +73,6 @@ export const Leftbox = ({ setCurrentChatView }) => {
                                     No Friends 
                                 </div>
                             )}
-                                
                         </div>
                         ))
                     )}
@@ -85,5 +86,6 @@ export const Leftbox = ({ setCurrentChatView }) => {
 }
 
 Leftbox.propTypes = {
-    setCurrentChatView: PropTypes.func.isRequired
+    setCurrentChatView: PropTypes.func.isRequired,
+    incomingMessage: PropTypes.object
 }

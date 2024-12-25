@@ -27,6 +27,12 @@
     gap: 10px;
 }
 
+.h_banner_u{
+    cursor: pointer;
+    z-index: 5;
+    position: relative;
+}
+
 .banner_image_profile, .banner_del{
     padding: 10px;
     position: relative;

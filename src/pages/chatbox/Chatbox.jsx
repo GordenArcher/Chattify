@@ -24,7 +24,7 @@ export const Chatbox = () => {
 
                 <div className="leftbox">
                     <div className="content">
-                        {currentView === "chat" && <Leftbox incomingMessage={incomingMessage} setCurrentChatView={setCurrentChatView} />}
+                        {currentView === "chat" && <Leftbox setCurrentView={setCurrentView} incomingMessage={incomingMessage} setCurrentChatView={setCurrentChatView} />}
                         {currentView === "settings" && <Settings />}
                         {currentView === "find_friends" && <FindFrinds />}
                         {currentView === "profile" && <Profile />}

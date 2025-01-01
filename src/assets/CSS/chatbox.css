@@ -1,8 +1,14 @@
-.chatbox, .boxcontainer, .chatwrapper, .leftchatboxwrap,
+.chatbox{
+    width: 100%;
+    height: 100vh;
+}
+
+.boxcontainer, .chatwrapper, .leftchatboxwrap,
 .leftsearchlist, .listfriends, .listswrap, .liscontainer, .Profile, .user_profile, .profile_wrap,
 .user_profile_container, .user_cover_image, .user_profile_image, .users_details, .use_del,
 .bio_edit, .set_bio, .op, .user_bio_info, .rt, .edit_b, .no_cover, .user_username_wrap, .s_username_f,
-.s_email_f{
+.s_email_f, .find-friends, .find_friends_in, .s_friends, .find_friends_wrap, .search_input,
+.searc, .user_container, .user_cont, .n_fie{
     width: 100%;
     height: 100%;
 }
@@ -26,9 +32,13 @@
     border-radius: 4px;
 }
 
-.chatwrapper, .liscontainer, .qwerty{
+.chatwrapper, .liscontainer, .qwerty, .user_cont, .user_conatiner_profile, .options{
     display: flex;
     flex-direction: row;
+}
+
+.user_conatiner_profile{
+    align-items: center;
 }
 
 ::-webkit-scrollbar{
@@ -59,7 +69,7 @@
 }
 
 .leftchatboxwrap, .leftchatheader, .listswrap, .messTime, .use_del, .set_bio_cont,
-.rt, .se_us_name, .se_us_mail{
+.rt, .se_us_name, .se_us_mail, .s_friends, .find_friends_in, .all_users_search_wrap{
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -72,17 +82,17 @@
     background: hsl(207, 95%, 8%);
 }
 
-.lefthead{
+.lefthead, .search_head{
     font-size: 2rem;
     font-weight: 800;
 }
-/*  */
-.searchlistfriends {
+
+.searchlistfriends, .searc {
     position: relative;
     padding-bottom: 30px;
 }
 
-.searchlistfriends input{
+.searchlistfriends input, .searc input{
     position: relative;
     width: 100%;
     height: 45px;
@@ -97,17 +107,17 @@
     text-indent: 15px;
 }
 
-.searchlistfriends input:focus{
+.searchlistfriends input:focus, .searc input:focus{
     border: 1px solid hsl(0, 0%, 100%);
 }
 
-.searchlistfriends i{
+.searchlistfriends i, .searc i{
     position: absolute;
     left: 10px;
     top: 10px;
 }
 
-.liscontainer{
+.liscontainer, .user_container{
     cursor: pointer;
     align-items: center;
     transition: .3s ease;
@@ -117,11 +127,11 @@
     justify-content: space-between;
 }
 
-.liscontainer:hover{
+.liscontainer:hover, .user_container:hover{
     background: hsla(0, 0%, 85%, 0.09);
 }
 
-.listswrap, .liscontainer{
+.listswrap, .liscontainer, .user_container, .options, .user_conatiner_profile{
     gap: 10px;
 }
 
@@ -142,7 +152,7 @@
     justify-content: center;
 }
 
-.qwerty{
+.qwerty, .user_cont{
     justify-content: space-between;
     align-items: center;
     gap: 20px;
@@ -165,7 +175,7 @@
     align-items: center;
 }
 
-.messNum, .user_profile_details, .set_bio_cont, .se_us_name, .se_us_mail{
+.messNum, .user_profile_details, .set_bio_cont, .se_us_name, .se_us_mail, .all_users_search_wrap{
     position: relative;
 }
 
@@ -185,7 +195,7 @@
     position: relative;
 }
 
-.user_profile_container{
+.user_profile_container, .no_friends{
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -314,4 +324,68 @@
 .side{
     width: 50%;
     height: 100%;
+}
+
+.options .ch button{
+    padding: 10px;
+    color: hsl(0, 0%, 100%);
+    background: transparent;
+    font-size: 1rem;
+    transition: .3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.options .ch button span{
+    font-size: .8rem;
+    color: hsla(0, 0%, 85%, 0.32);
+}
+
+.options .ch button:hover:active{
+    border: 1px solid hsla(0, 0%, 85%, 0.09);
+}
+
+.options .ch button:hover{
+    border: 1px solid hsla(0, 0%, 85%, 0.09);
+}
+
+.options .decline button{
+    color: hsla(0, 100%, 50%, 0.588);
+}
+
+.options .decline button span{
+    color: hsla(0, 100%, 50%, 0.588);
+}
+
+.n_fie{
+    margin: 100px auto;
+}
+
+.brow_friends{
+    font-size: 1.3rem;
+    line-height: 2;
+}
+
+.friends_searcch_but{
+    text-align: center;
+}
+
+.friends_searcch_but button{
+    position: relative;
+    background: hsla(0, 0%, 100%, 0.56);
+    border: 1px solid hsla(0, 0%, 85%, 0.32);
+    padding: 15px;
+    text-align: center;
+    transition: .3s ease;
+}
+
+.friends_searcch_but button:hover{
+    transform: translateY(-6px);
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+}
+
+.friends_searcch_but button span{
+    padding-left: 10px;
 }

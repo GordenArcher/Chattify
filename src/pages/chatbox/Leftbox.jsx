@@ -1,25 +1,28 @@
 
 import '../../assets/CSS/chatbox.css'
 import PropTypes from 'prop-types'
-import { FetchUsers } from '../../utils/hooks/FetchUsers'
 import UserCard from '../../components/userCard'
 import FriendLoad from '../../components/FriendLoad'
 import { useState } from 'react'
+import { FetchRequests } from '../../utils/hooks/FetchRequests'
 
-export const Leftbox = ({ setCurrentChatView, incomingMessage }) => {
+export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView }) => {
 
-    const {usersData, loading, error} = FetchUsers()
+    const {user, isLoading, error} = FetchRequests()
     const [searchFriends, setSearchFriends] = useState("")
-
 
     const refresh = () => {
         location.reload()
     }
-  return (
+
+    
+
+  return (  
+
     <div className="leftChatbox">
         <div className="leftchatboxwrap">
             <div className="leftchatheader">
-                <div className="lefthead">
+                <div className="lefthead">     
                     <h3>Chattify</h3>
                 </div>
 
@@ -29,10 +32,10 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage }) => {
                         type='text' 
                         value={searchFriends} 
                         id="search" 
-                        list={usersData.username}
+                        autoComplete="off"
                         name="search" 
                         onChange={(e) => setSearchFriends(e.target.value)}
-                        placeholder="Search" 
+                        placeholder="Search for friends" 
                         />
                         <i className='bi bi-search'></i>
                     </div>
@@ -44,9 +47,7 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage }) => {
                     {error ? 
                         (
                             <div className='errorFri'>
-                                <h2>Error</h2>
-                                <p>Please click the button to  refresh</p>
-
+                                <span>Something went wrong</span>
                                 <div className='err_re_bu'>
                                     <button onClick={refresh}>
                                         <span>Refresh</span>
@@ -58,19 +59,45 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage }) => {
                             </div>
                         ) 
                         : (
-                        (loading ? (
+                        (isLoading ? (
                             <FriendLoad />
                         ) : (
                         <div className="listswrap">
-                            {usersData.length > 0 ? (
-                                (usersData.map((friend) => {
+                            {user.length > 0 ? (
+                                user.map(friend => {
+                                    const username = friend.username.toLowerCase()
+                                    const search = searchFriends.toLowerCase();
+
+                                    const isMatch = !search || username.includes(search); 
+                                
                                     return (
-                                        <UserCard incomingMessage={incomingMessage} searchFriends={searchFriends} friends={friend} setCurrentChatView={setCurrentChatView} key={friend.id} />
+                                        <UserCard
+                                            incomingMessage={incomingMessage}
+                                            searchFriends={searchFriends}
+                                            friends={friend}
+                                            setCurrentChatView={setCurrentChatView}
+                                            key={friend.id}
+                                            highlight={isMatch}
+                                        />
                                     );
-                                }))
+                                })
+                                
+                            
                             ) : (
-                                <div>
-                                    No Friends 
+                                <div className='n_fie'>
+                                    <div className="no_friends">
+                                        <div className="brow_friends">
+                                            <span>Hey! there,</span> <br />
+                                            <span>No friends yet ? <br /> Browse throught some of your colleque to send them a request</span>
+                                        </div>
+
+                                        <div className="friends_searcch_but">
+                                            <button onClick={() => setCurrentView("find_friends")}>
+                                                <i className='bi bi-magic'></i>
+                                                <span>Browse here</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -87,5 +114,6 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage }) => {
 
 Leftbox.propTypes = {
     setCurrentChatView: PropTypes.func.isRequired,
-    incomingMessage: PropTypes.object
+    incomingMessage: PropTypes.object,
+    setCurrentView: PropTypes.string.isRequired
 }

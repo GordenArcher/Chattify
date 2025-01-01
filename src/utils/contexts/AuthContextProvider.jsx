@@ -22,7 +22,7 @@ export const AuthContextProvider = ({children}) => {
     }
 
     const logout = () => {
-        localStorage.clear()
+        localStorage.removeItem("token")
         navigate("/")
     }
 

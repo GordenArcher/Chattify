@@ -80,3 +80,21 @@
 .n{
     text-transform: capitalize;
 }
+
+.preview_media_image{
+    position: absolute;
+    left: 20px;
+    top: -100px;
+}
+
+.preview_media_image .preview{
+    position: relative;
+    z-index: 10;
+}
+
+.preview img{
+    width: 120px;
+    height: 120px;
+    border-radius: 5px;
+    object-fit: cover;
+}

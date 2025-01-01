@@ -7,10 +7,13 @@ import { Register } from './pages/auth/Register';
 import { Chatbox } from './pages/chatbox/Chatbox';
 import { useContext } from 'react';
 import { AuthContext } from './utils/contexts/AuthContextProvider';
+import { FetchRequests } from './utils/hooks/FetchRequests';
 
 function App() {
   
   const { token } = useContext(AuthContext)
+  const all = FetchRequests()
+  console.log(all)
 
   return (
     <>
@@ -31,7 +34,8 @@ function App() {
             draggable
             pauseOnHover
             theme="dark"
-            transition: Bounce
+            stacked
+            transition: Bounce 
         />
     </>
   )

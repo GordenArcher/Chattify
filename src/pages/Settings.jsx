@@ -1,15 +1,14 @@
 import { useContext } from "react"
 import { AuthContext } from "../utils/contexts/AuthContextProvider"
 import { toast } from "react-toastify"
-import { useNavigate } from "react-router-dom"
 
 export const Settings = () => {
   const { logout, token } = useContext(AuthContext)
-  const navigate = useNavigate()
 
   const logoutUser = async () => {
 
     const response = await fetch("http://127.0.0.1:8000/api/auth/logout/", {method:"POST", headers: {
+      "Content-Type": "application/json",
       "Authorization": `Token ${token}`,
     }})
 
@@ -18,7 +17,7 @@ export const Settings = () => {
       console.log(data)
       toast.success(data.message)
       logout()
-      navigate("/")
+      
     }else{
       const errordata = await response.json()
       console.log(errordata)

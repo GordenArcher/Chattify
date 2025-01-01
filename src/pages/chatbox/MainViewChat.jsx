@@ -6,11 +6,15 @@ import PropTypes from 'prop-types';
 import { AuthContext } from '../../utils/contexts/AuthContextProvider';
 import FriendInfo from '../../components/FriendInfo';
 import { U } from '../../utils/hooks/FetchUsers';
+import AppIcon from '../../../public/G-KANAD.jpg'
+import { toast } from 'react-toastify';
 
 export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingMessage }) => {
   const [message, setMessage] = useState("")
   const [status, setStatus] = useState("")
   const [messages, setMessages] = useState([])
+  const [mediaPreview, setMediaPreview] = useState(null)
+  const [mediaMessage, setMediaMessage] = useState(null)
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
   const websocket = useRef(null)
@@ -19,33 +23,33 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
   const {data, loading} = U(currentChatView)
   const [friendProfile, setFriendProfile] = useState({})
   const [chatMessages, setChatMessages] = useState([])
-  // console.log(chatMessages)
+  console.log(chatMessages)
 
   useEffect(() => {
-
     setFriendProfile(data.profile)
     setChatMessages(data.messages)
+    setStatus("Online")
 
   }, [data.profile, data.messages])
 
   useEffect(() => {
-    if (Notification.permission !== "granted") {
+    if(Notification.permission !== "granted") {
         Notification.requestPermission();
     }
-}, []);
+  }, []);
 
 const showNotification = (sender, message) => {
   if (Notification.permission === "granted") {
       new Notification(`New message from ${sender}`, {
           body: message,
-          // icon: "/static/images/notification_icon.png",÷\
+          icon: AppIcon,
       });
   } else if (Notification.permission !== "denied") {
       Notification.requestPermission().then(permission => {
           if (permission === "granted") {
               new Notification(`New message from ${sender}`, {
                   body: message,
-                  // icon: "/static/images/notification_icon.png",
+                  icon: AppIcon,
               });
           }
       });
@@ -69,27 +73,19 @@ const showNotification = (sender, message) => {
       try {
         const data = JSON.parse(e.data);
 
+        if(data.type === 'chat_message'){
           setMessages((prevMessages) => [...prevMessages, data]);
           setIncomingMessage(data)
 
           if(document.hasFocus()){
-            showNotification(data.sender, data.message);
+            showNotification(data.username, data.message);
           }
-
-          if(Notification.permission === 'granted'){
-          const notification = new Notification(data.username, 
-            {
-              body: data.message,
-            }
-          )
-
-          notification.onclick = () => {
-            window.focus()
-            open(data.username)
-          }
+            console.log("incoming message", data);
         }
-        
-          console.log("incoming message", data);
+        else{
+          toast.error(data)
+        }
+
         
       } catch (error) {
         console.error("Error parsing message data", error);
@@ -99,11 +95,43 @@ const showNotification = (sender, message) => {
     websocket.current.onclose = () => {
       console.log("Websocket closed")
     }
-    
 
-    const sendMessages = () => {
-      websocket.current.send(JSON.stringify({ message: message}))
+    const handleMediaChange = (e) => {
+        const file = e.target.files[0]; 
+        if (file) {
+          setMediaMessage(file);
+          
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setMediaPreview(reader.result);  
+          };
+          reader.readAsDataURL(file); 
+        }
+      };
+
+    const sendMessages = (e) => {
+      e.preventDefault()
+  
+      if(mediaMessage) {
+        const reader = new FileReader();
+          reader.onloadend = (e) => {
+            setMediaPreview(reader.result); 
+            const image =  e.target.result
+            websocket.current.send(JSON.stringify(image))
+          };
+          reader.readAsDataURL( mediaMessage ); 
+      
+          setMediaPreview(null)
+      } else {
+
+        if(!message.trim()) return toast.error("No message sent")
+
+        websocket.current.send(JSON.stringify({ message}))
+      }
+      
       setMessage("")
+      setMediaMessage(null)
+      
     }
 
   const togglePicker = () => {
@@ -114,47 +142,17 @@ const showNotification = (sender, message) => {
     setMessage((prev) => prev + emoji.emoji);
   };
 
-  // useEffect(() => {
-  //   const checkInternetConnection = async () => {
-  //     try {
-  //       const response = await fetch("https://www.google.com", { mode: "no-cors" });
-  //       console.log(response)
-  //       if (response.ok || response.type === "opaque") {
-  //         setStatus("Online");
-  //       }
-  //     } catch {
-  //       setStatus("Offline");
-  //     }
-  //   };
-    
-
-  //   document.addEventListener("click", checkInternetConnection);
-
-  //   return () => {
-  //     document.removeEventListener("click", checkInternetConnection);
-  //   };
-  // }, []);
-
-
-
   useEffect(() => {
 
-    const chectOnlineStatus = () => {
-      if(navigator.onLine){
-        setStatus("Online")
-        console.log("Online...")
-      }else{
-        console.log("Offline")
-        setStatus("Offline")
-      }
+    const closeEmogi = () => {
+      setShowPicker(false)
+      setShowOptions(false)
     } 
 
-    window.addEventListener("online", chectOnlineStatus)
-    window.addEventListener("offline", chectOnlineStatus);
+    document.addEventListener("click", closeEmogi)
 
     return () => {
-      window.removeEventListener("online", chectOnlineStatus)
-      window.addEventListener("offline", chectOnlineStatus);
+      document.removeEventListener("click", closeEmogi)
     }
   }, [])
   
@@ -259,6 +257,13 @@ const showNotification = (sender, message) => {
               </div>
             </div>
             <div className="chatinput">
+
+              {mediaPreview && <div className="preview_media_image">
+                <div className="preview">
+                  <img src={mediaPreview} alt="message media" />
+                </div>
+              </div>}
+              
               <div className="messagecontent">
                 <div className="emoji">
                   <button 
@@ -271,7 +276,12 @@ const showNotification = (sender, message) => {
                   </button>
                 </div>
                 <div className="attachFile">
-                <input type="file" name='media' id="file" hidden />
+                <input 
+                type="file" 
+                name='media' 
+                id="file" 
+                onChange={handleMediaChange}
+                hidden />
                   <label htmlFor="file">
                     <i className="bi bi-images"></i>
                    

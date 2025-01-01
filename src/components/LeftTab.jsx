@@ -40,8 +40,8 @@ export const LeftTab = ({ setCurrentView }) => {
 
                 <div className="profile">
                     <div className="profileimage" onClick={() => setCurrentView("profile")}>
-                        {user.payload?.profile_picture ? (
-                            <img src={`http://localhost:8000${user.payload?.profile_picture}`} alt="user profile" />
+                        {user.profile?.profile_picture ? (
+                            <img src={`http://localhost:8000${user.profile?.profile_picture}`} alt="user profile" />
                         ) : (
                             <div className='no_profile_i i'>{ usersDataDet.charAt(0).toUpperCase() }</div>
                         )}

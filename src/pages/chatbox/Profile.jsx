@@ -26,9 +26,8 @@ formData.append("bio", profileData.bio)
   const setProfile = async () => {
 
     if(!profileData.bio){
-      return toast.error("You need to Enter some texts")
+      return toast.error("You didn't enter any message as bio")
     }
-
 
     setIsLoading(true)
     try {

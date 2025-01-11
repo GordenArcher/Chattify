@@ -7,6 +7,7 @@ import { Settings } from "../Settings"
 import FindFrinds from "./FindFrinds"
 import Profile from "./Profile"
 import Selected from "../../components/!Selected"
+import Notification from "./Notification"
 
 export const Chatbox = () => {
 
@@ -28,6 +29,7 @@ export const Chatbox = () => {
                         {currentView === "settings" && <Settings />}
                         {currentView === "find_friends" && <FindFrinds />}
                         {currentView === "profile" && <Profile />}
+                        {currentView === "notification" && <Notification />}
                     </div>
                 </div>
 

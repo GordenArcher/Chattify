@@ -1,10 +1,14 @@
 import '../App.css'
 import PropTypes from 'prop-types'
 import { GetUserProfile } from '../utils/hooks/GetProfile'
+import { useContext } from 'react'
+import { AuthContext } from '../utils/contexts/AuthContextProvider'
 
 export const LeftTab = ({ setCurrentView }) => {
 
     const {user, usersDataDet} = GetUserProfile()
+    const {notificationCount} = useContext(AuthContext)
+    
 
   return (
     <div className='tab'>
@@ -25,6 +29,21 @@ export const LeftTab = ({ setCurrentView }) => {
                         <button onClick={() => setCurrentView("find_friends")}>
                             <i className='bi bi-person'></i>
                         </button>
+                    </div>
+                </div>
+
+                <div className="notification">
+                    <div className="notification-icon">
+                        <button onClick={() => setCurrentView("notification")}>
+                            <i className='bi bi-bell'></i>
+                        </button>
+
+                        {notificationCount > 0 && 
+                            <div className="noti-count">
+                                {notificationCount}
+                            </div>
+                        }
+                        
                     </div>
                 </div>
             </div>
@@ -55,5 +74,6 @@ export const LeftTab = ({ setCurrentView }) => {
 }
 
 LeftTab.propTypes = {
-    setCurrentView: PropTypes.func.isRequired
+    setCurrentView: PropTypes.func.isRequired,
+    notificationCount: PropTypes.number
 }

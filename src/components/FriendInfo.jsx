@@ -1,6 +1,16 @@
 import PropTypes from "prop-types"
+import { useEffect, useState } from "react"
 
-const FriendInfo = ({f, loading, setShowFriendInfo}) => {
+const FriendInfo = ({f, loading, setShowFriendInfo, chatMessages}) => {
+    const [chatMedia, setChatMedia] = useState({})
+    console.log(chatMedia)
+    console.log(chatMessages.media)
+
+    useEffect(() => {
+        setChatMedia(chatMessages.media)
+    }, [chatMessages.media])
+
+    const [activeTab, setActiveTab] = useState("media")
   return (
     <div className='friend_info_data'>
         <div className="close_state">
@@ -57,6 +67,31 @@ const FriendInfo = ({f, loading, setShowFriendInfo}) => {
                     </div>
                 </div>
             </div>
+
+            <div className="media">
+                <div className="chat_media">
+                    <div className="tab">
+                        <div className="media-tab">
+                            <button onClick={() => setActiveTab("media")}>
+                                <span>
+                                    <i className="bi bi-images"></i>
+                                </span>
+                                <span>
+                                    Media
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {activeTab === "media" && (
+                        <div className="media-files">
+                            <div className="med_file">
+                                
+                            </div>
+                        </div>
+                    ) }
+                </div>
+            </div>
         </div>
     </div>
   )
@@ -65,12 +100,18 @@ const FriendInfo = ({f, loading, setShowFriendInfo}) => {
 FriendInfo.propTypes = {
     loading: PropTypes.bool.isRequired,
     setShowFriendInfo: PropTypes.func.isRequired,
-    f: PropTypes.shape(
-        // bio: PropTypes.string.isRequired,
-        // profile_picture: PropTypes.string.isRequired,
-        // cover_picture: PropTypes.string.isRequired,
-        // bio: PropTypes.string.isRequired,
-    )
+    f: PropTypes.shape({
+        username: PropTypes.string.isRequired,
+        email: PropTypes.string.isRequired,
+        profile: PropTypes.shape({
+            bio: PropTypes.string.isRequired,
+            profile_picture: PropTypes.string.isRequired,
+            cover_picture: PropTypes.string.isRequired,
+        })
+    }),
+    chatMessages: PropTypes.shape({
+        media: PropTypes.string
+    })
 }
 
 export default FriendInfo

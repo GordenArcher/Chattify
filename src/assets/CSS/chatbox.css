@@ -8,7 +8,8 @@
 .user_profile_container, .user_cover_image, .user_profile_image, .users_details, .use_del,
 .bio_edit, .set_bio, .op, .user_bio_info, .rt, .edit_b, .no_cover, .user_username_wrap, .s_username_f,
 .s_email_f, .find-friends, .find_friends_in, .s_friends, .find_friends_wrap, .search_input,
-.searc, .user_container, .user_cont, .n_fie{
+.searc, .user_container, .user_cont, .n_fie, .notification, .all_notification, .notify,
+.recieved_req, .rec_rque_flex{
     width: 100%;
     height: 100%;
 }
@@ -69,7 +70,8 @@
 }
 
 .leftchatboxwrap, .leftchatheader, .listswrap, .messTime, .use_del, .set_bio_cont,
-.rt, .se_us_name, .se_us_mail, .s_friends, .find_friends_in, .all_users_search_wrap{
+.rt, .se_us_name, .se_us_mail, .s_friends, .find_friends_in, .all_users_search_wrap,
+.notify, .rec_rque_flex{
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -82,14 +84,18 @@
     background: hsl(207, 95%, 8%);
 }
 
-.lefthead, .search_head{
+.lefthead, .search_head, .notification_head{
     font-size: 2rem;
     font-weight: 800;
 }
 
-.searchlistfriends, .searc {
+.searchlistfriends, .searc, .recieved_title {
     position: relative;
     padding-bottom: 30px;
+}
+
+.recieved_title{
+    padding-bottom: 20px;
 }
 
 .searchlistfriends input, .searc input{

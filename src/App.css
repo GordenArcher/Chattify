@@ -1,69 +1,74 @@
 
-.spin{
-    width: 100%;
-    height: 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .spin{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 *{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  .tab, .flow{
-    width: 100%;
-    height: 100%;
-  }
-  
-  .flow{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-  }
-  
-  .settings, .profile, .chats{
-    position: relative;
-  }
-  
-  .profile{
-    margin-top: 30px;
-  }
-  
-  .settingsicon button, .chaticon button, .profileimage img, .addfriendicon button, .no_profile_i{
-    width: 45px;
-    height: 45px;
-    border: none;
-    background: transparent;
-    border-radius: 50%;
-    transition: .3s ease;
-    cursor: pointer;
-    z-index: 1;
-  }
-  
-  .profileimage img{
-    border: 1px solid hsl(0, 0%, 100%);
-    object-fit: cover;
-  }
-  
-  .settingsicon button:hover, .chaticon button:hover, .addfriendicon button:hover{
-    background: hsla(0, 0%, 85%, 0.32);
-  }
-  
-  .settings button i, .chaticon button i, .addfriendicon button i{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    color: hsl(0, 0%, 100%);
-  }
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
 
+.tab, .flow{
+  width: 100%;
+  height: 100%;
+}
 
+.flow{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.settings, .profile, .chats, .notification, .cl_sea{
+  position: relative;
+}
+
+.profile{
+  margin-top: 30px;
+}
+
+.settingsicon button, .chaticon button, .profileimage img, .addfriendicon button, 
+.no_profile_i, .notification-icon button, .cl_sea button{
+  width: 45px;
+  height: 45px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  transition: .3s ease;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.profileimage img{
+  border: 1px solid hsl(0, 0%, 100%);
+  object-fit: cover;
+}
+
+.settingsicon button:hover, .chaticon button:hover, .addfriendicon button:hover, 
+.notification-icon button:hover, .cl_sea button:hover{
+  background: hsla(0, 0%, 85%, 0.32);
+}
+
+.settings button i, .chaticon button i, .addfriendicon button i, .notification-icon button i,
+.cl_sea button i{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: hsl(0, 0%, 100%);
+}
+
+.cl_sea button i{
+  font-size: 1.5rem;
+}
 
 .subSpin {
   width: 32px;
@@ -130,3 +135,19 @@
   40% { box-shadow: 0 2.5em 0 0 }
 }
     
+.noti-count{
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid tomato;
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  border-radius: 50px;
+  background: tomato;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: .8rem;
+}

@@ -6,30 +6,29 @@ import PropTypes from 'prop-types';
 import { AuthContext } from '../../utils/contexts/AuthContextProvider';
 import FriendInfo from '../../components/FriendInfo';
 import { U } from '../../utils/hooks/FetchUsers';
-import AppIcon from '../../../public/G-KANAD.jpg'
+import AppIcon from '../../assets/images/G-KANAD.jpg';
 import { toast } from 'react-toastify';
 
 export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingMessage }) => {
   const [message, setMessage] = useState("")
   const [status, setStatus] = useState("")
-  const [messages, setMessages] = useState([])
   const [mediaPreview, setMediaPreview] = useState(null)
-  const [mediaMessage, setMediaMessage] = useState(null)
+  const [mediaMessage, setMediaMessage] = useState("")
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
   const websocket = useRef(null)
-  const { token } = useContext(AuthContext)
+  const { token, setMessages, messages } = useContext(AuthContext)
   const [showOptions, setShowOptions] = useState(false)
   const {data, loading} = U(currentChatView)
   const [friendProfile, setFriendProfile] = useState({})
   const [chatMessages, setChatMessages] = useState([])
-  console.log(chatMessages)
+  const [searchChat, setSearchChat] = useState(false)
+  const [searchChatInput, setSearchChatInput] = useState("")
 
   useEffect(() => {
     setFriendProfile(data.profile)
     setChatMessages(data.messages)
     setStatus("Online")
-
   }, [data.profile, data.messages])
 
   useEffect(() => {
@@ -38,23 +37,6 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
     }
   }, []);
 
-const showNotification = (sender, message) => {
-  if (Notification.permission === "granted") {
-      new Notification(`New message from ${sender}`, {
-          body: message,
-          icon: AppIcon,
-      });
-  } else if (Notification.permission !== "denied") {
-      Notification.requestPermission().then(permission => {
-          if (permission === "granted") {
-              new Notification(`New message from ${sender}`, {
-                  body: message,
-                  icon: AppIcon,
-              });
-          }
-      });
-  }
-}
 
 
     const CHAT_BASE_URL = "localhost:8000"
@@ -65,21 +47,53 @@ const showNotification = (sender, message) => {
       console.log("websockets opened")
     }
 
-    websocket.current.onerror = (Error) => {
-      console.log("error", Error)
-    }
+    websocket.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    
+      setTimeout(() => {
+        console.log("Attempting to reconnect...");
+        if (websocket.current.readyState !== WebSocket.CLOSED) {
+          websocket.current.close();
+        }
+    
+        websocket.current = new WebSocket(`ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}/?token=${token}`);
+        
+        websocket.current.onopen = () => {
+          console.log("WebSocket connection reopened.");
+        };
+    
+        websocket.current.onmessage = (message) => {
+          console.log("Message received:", message);
+          // Add your message-handling logic here
+        };
+    
+        websocket.current.onerror = (err) => {
+          console.error("WebSocket error after reconnect:", err);
+        };
+    
+      }, 2000);
+    };
+    
 
     websocket.current.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data);
 
         if(data.type === 'chat_message'){
-          setMessages((prevMessages) => [...prevMessages, data]);
-          setIncomingMessage(data)
+          setMessages((prevMessages) => {
+            const isDuplicate = prevMessages.some(
+              (message) => message.message_id === data.message_id
+            );
+            return isDuplicate ? prevMessages : [...prevMessages, data];
+          });
 
-          if(document.hasFocus()){
-            showNotification(data.username, data.message);
-          }
+
+
+          setIncomingMessage(data)
+          showNotification("Gorden", "Hiii");
+          // if(document.hasFocus()){
+            
+          // }
             console.log("incoming message", data);
         }
         else{
@@ -89,6 +103,24 @@ const showNotification = (sender, message) => {
         
       } catch (error) {
         console.error("Error parsing message data", error);
+      }
+    }
+
+    const showNotification = (sender, message) => {
+      if (Notification.permission === "granted") {
+          new Notification(`New message from ${sender}`, {
+              body: message,
+              icon: AppIcon,
+          });
+      } else if (Notification.permission !== "denied") {
+          Notification.requestPermission().then(permission => {
+              if (permission === "granted") {
+                  new Notification(`New message from ${sender}`, {
+                      body: message,
+                      icon: AppIcon,
+                  });
+              }
+          });
       }
     }
 
@@ -114,24 +146,26 @@ const showNotification = (sender, message) => {
   
       if(mediaMessage) {
         const reader = new FileReader();
-          reader.onloadend = (e) => {
-            setMediaPreview(reader.result); 
-            const image =  e.target.result
-            websocket.current.send(JSON.stringify(image))
-          };
-          reader.readAsDataURL( mediaMessage ); 
-      
+
+        reader.onload = () => {
+          const base64 = reader.result; 
+          websocket.current.send(
+            JSON.stringify({ "media": base64 }) 
+          );
+          setMediaMessage(null)
           setMediaPreview(null)
+        };
+      
+        reader.readAsDataURL(mediaMessage);
       } else {
 
         if(!message.trim()) return toast.error("No message sent")
 
-        websocket.current.send(JSON.stringify({ message}))
+        websocket.current.send(JSON.stringify({ message }))
+
+        setMessage("")
       }
-      
-      setMessage("")
-      setMediaMessage(null)
-      
+
     }
 
   const togglePicker = () => {
@@ -163,14 +197,55 @@ const showNotification = (sender, message) => {
         <div className="chatcontent">
           <div className="chathead">
             <div className="chat_banner">
-              <div className="h_banner">
+              {searchChat ? (
+                <div className="serach_chat">
+                  <div className="search__c">
+                    <div className="searc_friend_chat">
+                      <div className="serach_in">
+                        <input 
+                        type="text"
+                        id='chat-search'
+                        value={searchChatInput}
+                        onChange={(e) => setSearchChatInput(e.target.value)}
+                        placeholder='Search for a specific text'
+                        />
+
+                      </div>
+                    </div>
+
+                    <div className="close_search">
+                      <div className="cl_sea">
+                        <button onClick={() => setSearchChat(false)}>
+                          <i className='bi bi-x-circle'></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h_banner">
                 <div className="friend_banner_details">
                   <div className="banner_user_details">
                   <div className="h_banner_u" onClick={() => setShowFriendInfo(true)}>
                     <div className="banner_image_profile">
-                      <div className='no_profile'>
-                        {currentChatView.charAt(0).toUpperCase()}
-                      </div>
+                      {friendProfile ? (
+                          (friendProfile.profile?.profile_picture ? (
+                              <div className='friendProfile fp'>
+                                <img src={`http://localhost:8000${friendProfile.profile?.profile_picture}`} alt={`${friendProfile.username}'s profile`}/>
+                              </div>
+                            ) : (
+                              
+                              <div className='no_profile'>
+                                {currentChatView[0].toUpperCase()}
+                              </div>
+                            ))
+                      ) : (
+                        <div className='no_profile'>
+                          {currentChatView[0].toUpperCase()}
+                        </div>
+                      )}
+                    
+                      
                     </div>
                     <div className="h_user_details">
                       <div className="banner_username">
@@ -190,7 +265,7 @@ const showNotification = (sender, message) => {
                   <div className="banner_del">
                     <div className="search_chat">
                       <div className="chat_s ud">
-                        <button>
+                        <button onClick={() => setSearchChat(true)}>
                           <span>
                             <i className='bi bi-search'></i>
                           </span>
@@ -241,22 +316,61 @@ const showNotification = (sender, message) => {
                   </div>
                 </div>
               </div>
+              )}
+              
             </div>
           </div>
           <div className="mainchatview">
             <div className="chatview">
               <div className="incoming">
                 <div className="cm">
-                    {messages.map((msg, index) => {
+                    {messages.map((msg) => {
+                      const time = new Date(msg.timestamp)
+                      const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
                       return (
-                        <div key={index}>{msg.message}</div>
+                        <div key={msg.id} className='inbox'>
+                          {msg.loggedInUser === msg.sender ? (
+                            <div className='sender msg'>
+                              <div className="box">
+                                <div className="msg_wrap">
+                                  <div className="msg_div">
+                                    <span>{msg.message}</span>
+                                  </div>
+                                </div>
+
+                                <div className="msg_t">
+                                  <div className="msg_tst">
+                                    <p>{timestamp}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className='reciever msg'>
+                              <div className="box">
+                                <div className="msg_wrap">
+                                  <div className="msg_div">
+                                    <span>{msg.message}</span>
+                                  </div>
+                                </div>
+
+                                <div className="msg_t">
+                                  <div className="msg_tst">
+                                    <p>{timestamp}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       )
                     })}
-                
                 </div>
               </div>
             </div>
-            <div className="chatinput">
+          </div>
+
+          <div className="chatinput">
 
               {mediaPreview && <div className="preview_media_image">
                 <div className="preview">
@@ -278,13 +392,13 @@ const showNotification = (sender, message) => {
                 <div className="attachFile">
                 <input 
                 type="file" 
-                name='media' 
+                name='media'
                 id="file" 
                 onChange={handleMediaChange}
                 hidden />
+
                   <label htmlFor="file">
                     <i className="bi bi-images"></i>
-                   
                   </label>
                 </div>
 
@@ -316,13 +430,12 @@ const showNotification = (sender, message) => {
                 <EmojiPicker onEmojiClick={handleEmojiSelect} />
               </div>
             )}
-          </div>
         </div>
       </div>
       {
         showFriendInfo &&
        <div className='side'>
-          <FriendInfo f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
+          <FriendInfo chatMessages={chatMessages} f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
        </div>
       }
       

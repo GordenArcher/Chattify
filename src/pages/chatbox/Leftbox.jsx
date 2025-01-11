@@ -3,19 +3,17 @@ import '../../assets/CSS/chatbox.css'
 import PropTypes from 'prop-types'
 import UserCard from '../../components/userCard'
 import FriendLoad from '../../components/FriendLoad'
-import { useState } from 'react'
-import { FetchRequests } from '../../utils/hooks/FetchRequests'
+import { useContext, useState } from 'react'
+import { AuthContext } from '../../utils/contexts/AuthContextProvider'
 
 export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView }) => {
 
-    const {user, isLoading, error} = FetchRequests()
+    const {friends, isLoadingFriends, errorFriend} = useContext(AuthContext)
     const [searchFriends, setSearchFriends] = useState("")
 
     const refresh = () => {
         location.reload()
     }
-
-    
 
   return (  
 
@@ -44,7 +42,7 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView })
 
             <div className="listfriends">
                 <div className="lists">
-                    {error ? 
+                    {errorFriend ? 
                         (
                             <div className='errorFri'>
                                 <span>Something went wrong</span>
@@ -59,13 +57,13 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView })
                             </div>
                         ) 
                         : (
-                        (isLoading ? (
+                        (isLoadingFriends ? (
                             <FriendLoad />
                         ) : (
                         <div className="listswrap">
-                            {user.length > 0 ? (
-                                user.map(friend => {
-                                    const username = friend.username.toLowerCase()
+                            {friends.length > 0 ? (
+                                friends.map(friend => {
+                                    const username = friend.from_user.username.toLowerCase()
                                     const search = searchFriends.toLowerCase();
 
                                     const isMatch = !search || username.includes(search); 
@@ -74,15 +72,17 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView })
                                         <UserCard
                                             incomingMessage={incomingMessage}
                                             searchFriends={searchFriends}
-                                            friends={friend}
+                                            friend={friend}
                                             setCurrentChatView={setCurrentChatView}
                                             key={friend.id}
                                             highlight={isMatch}
                                         />
                                     );
-                                })
                                 
-                            
+                                }
+                                )
+                                
+                            // <div>HI</div>
                             ) : (
                                 <div className='n_fie'>
                                     <div className="no_friends">
@@ -115,5 +115,5 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView })
 Leftbox.propTypes = {
     setCurrentChatView: PropTypes.func.isRequired,
     incomingMessage: PropTypes.object,
-    setCurrentView: PropTypes.string.isRequired
+    setCurrentView: PropTypes.func.isRequired
 }

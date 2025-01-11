@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { SearchFriend } from "../../components/SearchFriend"
-import { FetchUsers } from "../../utils/hooks/FetchUsers"
 import { Lo } from "../../components/lo"
+import { AuthContext } from "../../utils/contexts/AuthContextProvider"
 
 const FindFrinds = () => {
 
-  const {usersData, loading} = FetchUsers()
+  const {usersData, loading} = useContext(AuthContext)
   const [searchFriends, setSearchFriends] = useState("")
 
   return (

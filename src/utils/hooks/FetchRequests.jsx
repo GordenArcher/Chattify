@@ -4,38 +4,76 @@ import { AuthContext } from '../contexts/AuthContextProvider'
 
 export const FetchRequests = () => {
 
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(false)
-    const [friends, setFriends] = useState([])
-    const { token } = useContext(AuthContext)
+    const { token, setIsLoadingFriends, setErrorFriend } = useContext(AuthContext)
 
     const BASE_URL = "http://127.0.0.1:8000/api/friends/"
+
+    const [friends, setFriends] = useState([])
 
     useEffect(() => {
 
         const getFriends = async () => {
 
-            setIsLoading(true)
+            setIsLoadingFriends(true)
     
             try {
                 const response = await axios.get(BASE_URL, {headers:{"Authorization":`Token ${token}`}})
 
-                console.log(response)
-                setFriends(response.data)
+                if(response){
+                    setErrorFriend(false)
+                  setFriends(response.data.data)  
+                }
                 
-            } catch (error) {
-                console.log(error)
-                setError(true)
+                
+            } catch {
+                setErrorFriend(true)
             }finally{
-                setIsLoading(false)
+                setIsLoadingFriends(false)
             }
     
         }
 
         getFriends()
 
-    }, [token, BASE_URL])
+    }, [token, BASE_URL, setErrorFriend, setIsLoadingFriends, setFriends])
+
+    return {users: friends}
+}
+
+
+export const FetchRecievedRequest = () => {
+
+    const [received, setReceived] = useState([])
+    const { token, setReceivedLoading, setNotificationCount } = useContext(AuthContext)
+    
+
+    const BASE_URL = "http://127.0.0.1:8000/api/recieved_request/"
+
+    useEffect(() => {
+
+        const getRecieved = async () => {
+
+            setReceivedLoading(true)
+            try {
+                const response = await axios.get(BASE_URL, {headers:{"Authorization":`Token ${token}`}})
+
+                if(response){
+                    setReceived(response.data.data)
+                    setNotificationCount(response.data.data.length)
+                }
+                
+            } catch (error) {
+                console.log(error)
+            }finally{
+                setReceivedLoading(false)
+            }
+    
+        }
+
+        getRecieved()
+
+    }, [token, BASE_URL, setReceivedLoading, setNotificationCount])
 
     
-  return {user: friends, isLoading, error}
+  return { received }
 }

@@ -5,23 +5,68 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { Chatbox } from './pages/chatbox/Chatbox';
-import { useContext } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { AuthContext } from './utils/contexts/AuthContextProvider';
-import { FetchRequests } from './utils/hooks/FetchRequests';
+import { FetchRecievedRequest, FetchRequests } from './utils/hooks/FetchRequests';
+import axios from 'axios';
 
 function App() {
   
-  const { token } = useContext(AuthContext)
-  const all = FetchRequests()
-  console.log(all)
+  const { token, setReceived,setIsLoading, setusersData, setIsError, setFriends } = useContext(AuthContext)
+  const { received } = FetchRecievedRequest()
+  const { users } = FetchRequests()
 
-  return (
-    <>
-      <Routes>
+  useEffect(() => {
+    setReceived(received)
+    setFriends(users)
+  }, [setReceived, received, setFriends, users])
+
+
+  const BASE_URL = "http://127.0.0.1:8000/"
+
+  const url = `${BASE_URL}api/users/`
+
+  useEffect(() => {
+      
+      const getAllUsers = async () => {
+          setIsLoading(true)
+
+          try {
+              const response = await axios.get(url, {headers: {"Authorization":`Token ${token}`}})
+              setusersData(response.data.data.users)
+              setIsLoading(false)
+
+          } catch (error) {
+              console.log("error", error)
+              setIsError("Error Retrieving users")
+          }finally{
+              setIsLoading(false)
+          }
+
+      }
+
+      if(token){
+          getAllUsers()
+      }
+      
+  }, [token, url, setIsError, setIsLoading, setusersData])
+  
+  
+
+  const routes = useMemo(() => (
+    <Routes>
         <Route path='/' element={ token ? <Chatbox />  : <Login /> } />
         <Route path='/auth/register' element={ <Register /> } />
         <Route path='*' element={<Navigate to={"/"} />} />
-      </Routes>
+    </Routes>
+  ), [token])
+
+  return (
+    <>
+    <div className='chat'>
+      {routes}
+    </div>
+      
 
     <ToastContainer
             position="top-center"

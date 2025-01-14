@@ -75,5 +75,5 @@ export const FetchRecievedRequest = () => {
     }, [token, BASE_URL, setReceivedLoading, setNotificationCount])
 
     
-  return { received }
+  return { received, setReceived }
 }

@@ -4,7 +4,7 @@ import { AuthContext } from "../utils/contexts/AuthContextProvider"
 import { toast } from "react-toastify"
 
 
-const RecievedRequest = props => {
+const RecievedRequest = (props, setReceived) => {
     const [isLoading, setIsLoading] = useState(false)
     const { token } = useContext(AuthContext)
 
@@ -25,8 +25,11 @@ const RecievedRequest = props => {
                 }
             })
             if(response.ok){
-                console.log(response)
-                toast.success(response.message)
+                const data = await response.json()
+                toast.success(data.message)
+
+                setReceived((previousrec) => previousrec.filter((rec) => rec.id !== props.id))
+                
             }
 
         } catch {

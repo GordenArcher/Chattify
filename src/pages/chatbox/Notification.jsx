@@ -4,7 +4,7 @@ import PropTypes from "prop-types"
 
 const Notification = () => {
 
-    const { received, isLoading,} = FetchRecievedRequest()
+    const { received, isLoading, setReceived} = FetchRecievedRequest()
 
 
   return (
@@ -27,7 +27,7 @@ const Notification = () => {
                       (received.length > 0 ? (
                         (received.map((noti, index) => {
                             return(
-                                <RecievedRequest key={index} {...noti} />
+                                <RecievedRequest key={index} setReceived={setReceived} {...noti} />
                             )
                         }))
                       ) : (
@@ -46,7 +46,8 @@ const Notification = () => {
 }
 
 Notification.propTypes = {
-    setNotificationCount: PropTypes.func
+    setNotificationCount: PropTypes.func,
+    setReceived: PropTypes.func
 }
 
 export default Notification

@@ -25,13 +25,26 @@ const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage }) =>
                     </div>
 
                     {friend.from_user.username === incomingMessage.sender || incomingMessage.recipient === friend.from_user.username ? (
-                        (incomingMessage.message && (
+                        (incomingMessage.message ? (
                             <div className="messageOverview">
                                 <div className="vieww">
-                                    <span>{incomingMessage.message}</span>
+                                        <span>{incomingMessage.message}</span>
+                                    
+                                    
                                 </div>
                             </div> 
-                        ))
+                        )
+                        : 
+                        (
+                            <div className="view_media">
+                                <span>
+                                    <i className="bi bi-images"></i>
+                                </span>
+
+                                <span>media</span>
+                            </div>
+                        )
+                        )
                         ) : (
                             null
                         )

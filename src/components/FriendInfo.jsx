@@ -1,14 +1,8 @@
 import PropTypes from "prop-types"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
-const FriendInfo = ({f, loading, setShowFriendInfo, chatMessages}) => {
-    const [chatMedia, setChatMedia] = useState({})
-    console.log(chatMedia)
-    console.log(chatMessages.media)
+const FriendInfo = ({f, loading, setShowFriendInfo}) => {
 
-    useEffect(() => {
-        setChatMedia(chatMessages.media)
-    }, [chatMessages.media])
 
     const [activeTab, setActiveTab] = useState("media")
   return (
@@ -109,9 +103,6 @@ FriendInfo.propTypes = {
             cover_picture: PropTypes.string.isRequired,
         })
     }),
-    chatMessages: PropTypes.shape({
-        media: PropTypes.string
-    })
 }
 
 export default FriendInfo

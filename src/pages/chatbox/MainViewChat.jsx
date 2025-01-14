@@ -21,15 +21,25 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
   const [showOptions, setShowOptions] = useState(false)
   const {data, loading} = U(currentChatView)
   const [friendProfile, setFriendProfile] = useState({})
-  const [chatMessages, setChatMessages] = useState([])
   const [searchChat, setSearchChat] = useState(false)
   const [searchChatInput, setSearchChatInput] = useState("")
+  const [typingIndicator, setTypingIndicator] = useState(null)
 
   useEffect(() => {
     setFriendProfile(data.profile)
-    setChatMessages(data.messages)
+
+    if (data?.messages) {
+      const sortedMessages = [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
+      setMessages(sortedMessages);
+    }
     setStatus("Online")
-  }, [data.profile, data.messages])
+  }, [data.profile, data.messages, setMessages])
+
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     if(Notification.permission !== "granted") {
@@ -38,8 +48,27 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
   }, []);
 
 
+  const showNotification = (sender, message) => {
+    if (Notification.permission === "granted") {
+        new Notification(`New message from ${sender}`, {
+            body: message,
+            icon: AppIcon,
+        });
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification(`New message from ${sender}`, {
+                    body: message,
+                    icon: AppIcon,
+                });
+            }
+        });
+    }
+  }
 
     const CHAT_BASE_URL = "localhost:8000"
+    
+    useEffect(() => {
 
     websocket.current = new WebSocket(`ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}/?token=${token}`)
 
@@ -79,6 +108,11 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
       try {
         const data = JSON.parse(e.data);
 
+        if (data.type === 'typing') {
+          console.log("typing....")
+          showTypingIndicator(data.loggedInUser);
+      }
+
         if(data.type === 'chat_message'){
           setMessages((prevMessages) => {
             const isDuplicate = prevMessages.some(
@@ -106,27 +140,11 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
       }
     }
 
-    const showNotification = (sender, message) => {
-      if (Notification.permission === "granted") {
-          new Notification(`New message from ${sender}`, {
-              body: message,
-              icon: AppIcon,
-          });
-      } else if (Notification.permission !== "denied") {
-          Notification.requestPermission().then(permission => {
-              if (permission === "granted") {
-                  new Notification(`New message from ${sender}`, {
-                      body: message,
-                      icon: AppIcon,
-                  });
-              }
-          });
-      }
-    }
-
     websocket.current.onclose = () => {
       console.log("Websocket closed")
     }
+    }, [currentChatView, setIncomingMessage, setMessages, token])
+
 
     const handleMediaChange = (e) => {
         const file = e.target.files[0]; 
@@ -150,7 +168,10 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
         reader.onload = () => {
           const base64 = reader.result; 
           websocket.current.send(
-            JSON.stringify({ "media": base64 }) 
+            JSON.stringify({ 
+              type: "message",
+              "media": base64
+             })
           );
           setMediaMessage(null)
           setMediaPreview(null)
@@ -161,7 +182,10 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
 
         if(!message.trim()) return toast.error("No message sent")
 
-        websocket.current.send(JSON.stringify({ message }))
+        websocket.current.send(JSON.stringify({
+          type: "message", 
+          message 
+        }))
 
         setMessage("")
       }
@@ -189,7 +213,36 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
       document.removeEventListener("click", closeEmogi)
     }
   }, [])
+
+  function showTypingIndicator(username) {
+    setTypingIndicator(`${username} is typing...`)
+
+    setTimeout(() => {
+      setTypingIndicator("")
+    }, 2000);
+}
   
+
+const messageChange = (e) => {
+  const newMessage = e.target.value; 
+  setMessage(newMessage); 
+
+  if (newMessage.length > 0) {
+    websocket.current.send(
+      JSON.stringify({
+        type: "typing",
+        typing: true,
+      })
+    )
+  } else {
+    websocket.current.send(
+      JSON.stringify({
+        type: "typing",
+        typing: false,
+      })
+    );
+  }
+}
 
   return (
     <div className="userchat">
@@ -255,7 +308,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
 
                           <div className="online_status">
                             <div className="state">
-                              <span>{status}</span>
+                              <span>{typingIndicator}</span>
                             </div>
                           </div>
                       </div>
@@ -325,16 +378,21 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
               <div className="incoming">
                 <div className="cm">
                     {messages.map((msg) => {
-                      const time = new Date(msg.timestamp)
+                      const time = new Date(msg.timestamp || msg.sent_at)
                       const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
                       return (
                         <div key={msg.id} className='inbox'>
-                          {msg.loggedInUser === msg.sender ? (
+                          {friendProfile.id !== msg.user ? (
                             <div className='sender msg'>
                               <div className="box">
                                 <div className="msg_wrap">
                                   <div className="msg_div">
-                                    <span>{msg.message}</span>
+                                    {msg.media ? (
+                                      <img src={`http://localhost:8000${msg.media}`} alt="" />
+                                    ) : (
+                                      <span>{msg.message}</span>
+                                    )}
+                                    
                                   </div>
                                 </div>
 
@@ -350,7 +408,11 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
                               <div className="box">
                                 <div className="msg_wrap">
                                   <div className="msg_div">
-                                    <span>{msg.message}</span>
+                                  {msg.media ? (
+                                      <img src={`http://localhost:8000${msg.media}`} alt="" />
+                                    ) : (
+                                      <span>{msg.message}</span>
+                                    )}
                                   </div>
                                 </div>
 
@@ -366,6 +428,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
                       )
                     })}
                 </div>
+                <div ref={messagesEndRef} />
               </div>
             </div>
           </div>
@@ -410,9 +473,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
                       id="message"
                       value={message}
                       placeholder="Send a Message"
-                      onChange={(e) => {
-                        setMessage(e.target.value);
-                      }}
+                      onChange={messageChange}
                     />
                   </div>
 
@@ -435,7 +496,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
       {
         showFriendInfo &&
        <div className='side'>
-          <FriendInfo chatMessages={chatMessages} f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
+          <FriendInfo f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
        </div>
       }
       

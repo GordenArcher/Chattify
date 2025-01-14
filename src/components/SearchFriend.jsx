@@ -29,7 +29,6 @@ export const SearchFriend = ({user, highlight}) => {
                 const data = await response.json()
                 if(data.status === 'success'){
                     toast.success(data.message)
-                    console.log(data)
                     
                 }
 

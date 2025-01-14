@@ -168,6 +168,11 @@
     color: hsla(0, 0%, 85%, 0.395);
 }
 
+.view_media{
+    display: flex;
+    gap: 15px;
+}
+
 .Timeset{
     font-size: .8rem;
 }

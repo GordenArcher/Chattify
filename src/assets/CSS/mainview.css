@@ -95,11 +95,15 @@
 
 .banner_actions_children{
     position: absolute;
-    margin-left: -150px;
-    width: 200px;
-    background: hsla(0, 0%, 100%, 0.378);
+    margin-left: -170px;
+    width: 220px;
+    background: hsl(207, 95%, 8%);
     border-radius: 3px;
+    border: 1px solid hsla(0, 0%, 80%, 0.232);
     z-index: 9;
+    opacity: 1;
+    transition: .3s ease;
+    transform: scale(1);
 }
 
 .actions_children{
@@ -317,7 +321,7 @@
 .reciever .box {
     max-width: 50%;
     float: left;
-    background: tomato;
+    background: hsl(241, 97%, 24%);
     padding: 15px;
     border-radius: 6px;
     display: flex;
@@ -328,7 +332,7 @@
 .sender .box {
     max-width: 50%;
     float: right;
-    background: red;
+    background: hsla(0, 0%, 80%, 0.42);
     padding: 15px;
     border-radius: 6px;
     display: flex;
@@ -341,10 +345,14 @@
     font-weight: 500;
 }
 
-.msg_t{
-    float: right;
+.msg_div img{
+    width: 250px;
+    height: 300px;
+    border-radius: 5px;
 }
 
+
 .msg_tst{
+    float: right;
     font-size: .8rem;
 }

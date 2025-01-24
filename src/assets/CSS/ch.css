@@ -1,4 +1,4 @@
-.friend_info_data, .conta, .firnd_iii{
+.friend_info_data, .conta, .firnd_iii, .media, .chat_media, .media-files, .media_flex-grid{
     width: 100%;
     height: 100%;
 }
@@ -140,3 +140,136 @@
     }
   }
     
+.chat_media{
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow: auto;
+}  
+
+.media .tabs{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.media .tabs .tab{
+    width: 100%;
+    position: relative;
+}
+
+.media .tabs .tab button{
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    border-radius: 5px;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    gap: 5px;
+    font-size: 1rem;
+    transition: .3s ease;
+}
+
+
+.media_flex-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+}
+
+.media_image{
+    width: 100%;
+    height: 100px;
+}
+
+.media_image img, .media_image video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.media_image video{
+    object-fit: cover;
+}
+
+.media_image img:hover{
+    transform: scale(1);
+}
+.preview_image_click {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: hsla(0, 0%, 0%, 0.7);
+    z-index: 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.preview_image_click .pre_image {
+    width: 80%;
+    height: 80%;
+    animation: scaleIn 0.3s ease-in-out;
+    transform-origin: center;
+    background: #011628; 
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.preview_image_click .pre_image img, .preview_image_click .pre_image video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.actions {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.actions .cls {
+    position: relative;
+}
+
+.actions .cls button {
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease;
+    border: none; 
+    cursor: pointer;
+}
+
+.actions .cls button i {
+    font-size: 1.5rem;
+}
+
+.actions .cls button:hover {
+    background: hsla(0, 0%, 100%, 0.1);
+    transform: scale(1.1);
+}

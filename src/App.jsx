@@ -9,6 +9,8 @@ import { useContext, useEffect, useMemo } from 'react';
 import { AuthContext } from './utils/contexts/AuthContextProvider';
 import { FetchRecievedRequest, FetchRequests } from './utils/hooks/FetchRequests';
 import axios from 'axios';
+import RequestPassword from './pages/RequestPassword';
+import { EmailSent } from './pages/Email-Sent';
 
 function App() {
   
@@ -42,7 +44,6 @@ function App() {
           }finally{
               setIsLoading(false)
           }
-
       }
 
       if(token){
@@ -57,6 +58,8 @@ function App() {
     <Routes>
         <Route path='/' element={ token ? <Chatbox />  : <Login /> } />
         <Route path='/auth/register' element={ <Register /> } />
+        <Route path='/reset-password' element={ <RequestPassword /> } />
+        <Route path='/email-done' element={ <EmailSent /> } />
         <Route path='*' element={<Navigate to={"/"} />} />
     </Routes>
   ), [token])

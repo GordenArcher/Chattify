@@ -5,6 +5,11 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthContextProvider } from './utils/contexts/AuthContextProvider.jsx'
 
+const removeLoader = () => {
+  const loader = document.querySelector('.loadApp');
+  if (loader) loader.style.display = 'none';
+};
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
@@ -16,3 +21,6 @@ createRoot(document.getElementById('root')).render(
     
   </StrictMode>,
 )
+
+
+removeLoader()

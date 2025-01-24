@@ -9,7 +9,7 @@ import { U } from '../../utils/hooks/FetchUsers';
 import AppIcon from '../../assets/images/G-KANAD.jpg';
 import { toast } from 'react-toastify';
 
-export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingMessage }) => {
+export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingMessage, typingIndicator, setTypingIndicator }) => {
   const [message, setMessage] = useState("")
   const [status, setStatus] = useState("")
   const [mediaPreview, setMediaPreview] = useState(null)
@@ -23,10 +23,12 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
   const [friendProfile, setFriendProfile] = useState({})
   const [searchChat, setSearchChat] = useState(false)
   const [searchChatInput, setSearchChatInput] = useState("")
-  const [typingIndicator, setTypingIndicator] = useState(null)
+  const messagesEndRef = useRef(null);
+  const [previewImage, setPreviewImage] = useState(null)
+  const [showMsgOpt, setShowMsgOpt] = useState(false)
 
   useEffect(() => {
-    setFriendProfile(data.profile)
+    setFriendProfile(data?.profile)
 
     if (data?.messages) {
       const sortedMessages = [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
@@ -34,8 +36,6 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
     }
     setStatus("Online")
   }, [data.profile, data.messages, setMessages])
-
-  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,15 +103,22 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
       }, 2000);
     };
     
-
+    let typingTimeout;
     websocket.current.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data);
 
         if (data.type === 'typing') {
-          console.log("typing....")
-          showTypingIndicator(data.loggedInUser);
-      }
+          setTypingIndicator(data.loggedInUser)
+
+            if (typingTimeout) {
+              clearTimeout(typingTimeout);
+            }
+
+          typingTimeout = setTimeout(() => {
+              setTypingIndicator(""); 
+          }, 3000);
+        }
 
         if(data.type === 'chat_message'){
           setMessages((prevMessages) => {
@@ -120,15 +127,8 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
             );
             return isDuplicate ? prevMessages : [...prevMessages, data];
           });
-
-
-
           setIncomingMessage(data)
           showNotification("Gorden", "Hiii");
-          // if(document.hasFocus()){
-            
-          // }
-            console.log("incoming message", data);
         }
         else{
           toast.error(data)
@@ -154,7 +154,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
           const reader = new FileReader();
           reader.onloadend = () => {
             setMediaPreview(reader.result);  
-          };
+          }
           reader.readAsDataURL(file); 
         }
       };
@@ -205,6 +205,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
     const closeEmogi = () => {
       setShowPicker(false)
       setShowOptions(false)
+      setShowMsgOpt(false)
     } 
 
     document.addEventListener("click", closeEmogi)
@@ -214,33 +215,30 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
     }
   }, [])
 
-  function showTypingIndicator(username) {
-    setTypingIndicator(`${username} is typing...`)
-
-    setTimeout(() => {
-      setTypingIndicator("")
-    }, 2000);
-}
   
 
 const messageChange = (e) => {
   const newMessage = e.target.value; 
   setMessage(newMessage); 
 
-  if (newMessage.length > 0) {
-    websocket.current.send(
-      JSON.stringify({
-        type: "typing",
-        typing: true,
-      })
-    )
+  if (websocket.current && websocket.current.readyState === WebSocket.OPEN) {
+    if (newMessage.length > 0) {
+      websocket.current.send(
+        JSON.stringify({
+          type: "typing",
+          typing: true,
+        })
+      );
+    } else {
+      websocket.current.send(
+        JSON.stringify({
+          type: "typing",
+          typing: false,
+        })
+      );
+    }
   } else {
-    websocket.current.send(
-      JSON.stringify({
-        type: "typing",
-        typing: false,
-      })
-    );
+    console.error("WebSocket is not open.");
   }
 }
 
@@ -308,7 +306,10 @@ const messageChange = (e) => {
 
                           <div className="online_status">
                             <div className="state">
-                              <span>{typingIndicator}</span>
+                              {typingIndicator === currentChatView && 
+                              <span>typing...</span>
+                              }
+                              
                             </div>
                           </div>
                       </div>
@@ -388,7 +389,12 @@ const messageChange = (e) => {
                                 <div className="msg_wrap">
                                   <div className="msg_div">
                                     {msg.media ? (
-                                      <img src={`http://localhost:8000${msg.media}`} alt="" />
+                                      (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                        <img draggable='false' src={`http://localhost:8000${msg.media}`} alt=""  onClick={() => setPreviewImage(msg.media)}/>
+                                      ) : (
+                                        <video src={`http://localhost:8000${msg.media}`} controls></video>
+                                        )
+                                      )
                                     ) : (
                                       <span>{msg.message}</span>
                                     )}
@@ -402,6 +408,15 @@ const messageChange = (e) => {
                                   </div>
                                 </div>
                               </div>
+
+                              {/* <div className="message_opti">
+                                <button onClick={() => setShowMsgOpt(true)}>
+                                    <i className='bi bi-three-dots-vertical'></i>
+                                </button>
+                                <div className="mesg_optionns">
+                                  
+                                </div>
+                              </div> */}
                             </div>
                           ) : (
                             <div className='reciever msg'>
@@ -409,8 +424,13 @@ const messageChange = (e) => {
                                 <div className="msg_wrap">
                                   <div className="msg_div">
                                   {msg.media ? (
-                                      <img src={`http://localhost:8000${msg.media}`} alt="" />
+                                    (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                      <img draggable='false' src={`http://localhost:8000${msg.media}`} onClick={() => setPreviewImage(msg.media)}/>
                                     ) : (
+                                      <video src={`http://localhost:8000${msg.media}`} controls></video>
+                                      )
+                                    )
+                                  ) : (
                                       <span>{msg.message}</span>
                                     )}
                                   </div>
@@ -422,6 +442,15 @@ const messageChange = (e) => {
                                   </div>
                                 </div>
                               </div>
+
+                              {/* <div className="message_opti">
+                                <button onClick={() => setShowMsgOpt(true)}>
+                                    <i className='bi bi-three-dots-vertical'></i>
+                                </button>
+                                <div className="mesg_optionns">
+                                  
+                                </div> 
+                              </div> */}
                             </div>
                           )}
                         </div>
@@ -496,9 +525,37 @@ const messageChange = (e) => {
       {
         showFriendInfo &&
        <div className='side'>
-          <FriendInfo f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
+          <FriendInfo messages={messages} previewImage={previewImage} setPreviewImage={setPreviewImage} f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
        </div>
       }
+
+  {previewImage && 
+      <div className="preview_image_click">
+          <div className="actions">
+              <div className="download cls">
+                  <a href="#" title="chattify image" download={`http://localhost:8000${previewImage}/`}>
+                      <button role="button" aria-label="download" >
+                          <i className="bi bi-download"></i>
+                      </button>
+                  </a>
+              </div>
+
+              <div className="close_ cls">
+                  <button onClick={() => setPreviewImage(null)}>
+                      <i className="bi bi-x"></i>
+                  </button>
+              </div>
+          </div>
+          <div className="pre_image">
+            {previewImage.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+              <img src={`http://localhost:8000${previewImage}/`} alt="image" />
+            ) : (
+              <video controls src={`http://localhost:8000${previewImage}/`}></video>
+            )}
+              
+          </div>
+      </div>
+  }
       
     </div>
   );
@@ -507,5 +564,7 @@ const messageChange = (e) => {
 MainViewChat.propTypes = {
   currentChatView: PropTypes.string.isRequired,  
   setCurrentChatView : PropTypes.func.isRequired,
-  setIncomingMessage: PropTypes.func
+  setIncomingMessage: PropTypes.func,
+  typingIndicator: PropTypes.string,
+  setTypingIndicator: PropTypes.func
 }

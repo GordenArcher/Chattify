@@ -6,7 +6,7 @@ import FriendLoad from '../../components/FriendLoad'
 import { useContext, useState } from 'react'
 import { AuthContext } from '../../utils/contexts/AuthContextProvider'
 
-export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView }) => {
+export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView, typingIndicator }) => {
 
     const {friends, isLoadingFriends, errorFriend} = useContext(AuthContext)
     const [searchFriends, setSearchFriends] = useState("")
@@ -76,6 +76,7 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView })
                                             setCurrentChatView={setCurrentChatView}
                                             key={friend.id}
                                             highlight={isMatch}
+                                            typingIndicator={typingIndicator}
                                         />
                                     );
                                 
@@ -115,5 +116,6 @@ export const Leftbox = ({ setCurrentChatView, incomingMessage, setCurrentView })
 Leftbox.propTypes = {
     setCurrentChatView: PropTypes.func.isRequired,
     incomingMessage: PropTypes.object,
-    setCurrentView: PropTypes.func.isRequired
+    setCurrentView: PropTypes.func.isRequired,
+    typingIndicator: PropTypes.string
 }

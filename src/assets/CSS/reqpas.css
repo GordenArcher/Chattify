@@ -1,0 +1,198 @@
+.email-done, .rp{
+    width: 100%;
+    height: 100vh;
+}
+
+.password_request, .request_left, .request_right, .reset_left_image,
+.right_wrapper, .request_form{
+    width: 100%;
+    height: 100%;
+}
+
+.rp{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.mail-sent img{
+    width: 80%;
+}
+
+.padd{
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.sent_mess{
+    margin-top: 50px;
+}
+
+.request_wrapper{
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.reset_left_image img{
+    width: 100%;
+    height: 100%;
+}
+
+.right_wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-direction: column;
+}
+
+.right_mess{
+    padding: 12px;
+    font-size: .5rem;
+}
+
+.request_form{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.request_form_input{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+}
+
+.request_form_input input{
+    width: 100%;
+    padding: 10px 70px 10px 10px;
+    height: 56px;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.request_form_input label{
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.request_form_input i{
+    position: absolute;
+    right: 30px;
+    bottom: 12px;
+    font-size: 1.3rem;
+}
+
+/* .sent_request button{
+    padding: 14px;
+    width: 100px;
+    height: 50px;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    border: 1px solid #ffffff11;
+} */
+
+.em{
+    padding: 30px;
+}
+
+.em button {
+    display: flex;
+    height: 3em;
+    width: 100px;
+    align-items: center;
+    justify-content: center;
+    background-color: hsla(0, 0%, 100%, 0.294);
+    border-radius: 3px;
+    letter-spacing: 1px;
+    transition: all 0.2s linear;
+    cursor: pointer;
+    border: none;
+    background: #ffffff9a;
+}
+   
+.em button > svg {
+    margin-right: 5px;
+    margin-left: 5px;
+    font-size: 20px;
+    transition: all 0.4s ease-in;
+}
+   
+.em button:hover > svg {
+    font-size: 1.2em;
+    transform: translateX(-5px);
+}
+   
+.em button:hover {
+    box-shadow: 9px 9px 33px #d1d1d111, -9px -9px 33px #ffffff10;
+    transform: translateY(-2px);
+}
+
+/* From Uiverse.io by BHARGAVPATEL1244 */ 
+.sent_request button {
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 14px;
+    width: 100px;
+    height: 50px;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    color: ghostwhite;
+}
+   
+.sent_request button span {
+    position: relative;
+    z-index: 10;
+    transition: color 0.4s;
+}
+   
+.sent_request button:hover span {
+    color: black;
+}
+   
+.sent_request button::before,
+.sent_request button::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+   
+.sent_request button::before {
+    content: "";
+    background: hsl(241, 97%, 24%);
+    width: 120%;
+    left: -10%;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+   
+.sent_request button:hover::before {
+    transform: translate3d(100%, 0, 0);
+}
+   

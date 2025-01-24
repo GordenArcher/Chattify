@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import { useRef } from "react";
 
-const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage }) => {
+const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage, typingIndicator }) => {
     const date = new Date(incomingMessage.timestamp)
     const formattedTime = `${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`;
     const display = useRef(null)
@@ -23,14 +23,13 @@ const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage }) =>
                     <div className="friendname">
                         <h3 style={{ fontWeight: highlight ? 'bold' : 'normal' }}>{friend.from_user.username}</h3>
                     </div>
+                    {typingIndicator === friend.from_user.username && ("typing") }
 
                     {friend.from_user.username === incomingMessage.sender || incomingMessage.recipient === friend.from_user.username ? (
                         (incomingMessage.message ? (
                             <div className="messageOverview">
                                 <div className="vieww">
                                         <span>{incomingMessage.message}</span>
-                                    
-                                    
                                 </div>
                             </div> 
                         )
@@ -95,5 +94,6 @@ UserCard.propTypes = {
         }) 
         })
         
-    }).isRequired
+    }).isRequired,
+    typingIndicator: PropTypes.string
 };

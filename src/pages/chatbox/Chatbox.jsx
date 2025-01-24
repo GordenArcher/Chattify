@@ -14,6 +14,7 @@ export const Chatbox = () => {
     const [currentView, setCurrentView] = useState("chat");
     const [currentChatView, setCurrentChatView] = useState("");
     const [incomingMessage, setIncomingMessage] = useState({});
+    const [typingIndicator, setTypingIndicator] = useState(null)
 
   return (
     <div className="chatbox">
@@ -25,7 +26,7 @@ export const Chatbox = () => {
 
                 <div className="leftbox">
                     <div className="content">
-                        {currentView === "chat" && <Leftbox setCurrentView={setCurrentView} incomingMessage={incomingMessage} setCurrentChatView={setCurrentChatView} />}
+                        {currentView === "chat" && <Leftbox typingIndicator={typingIndicator} setCurrentView={setCurrentView} incomingMessage={incomingMessage} setCurrentChatView={setCurrentChatView} />}
                         {currentView === "settings" && <Settings />}
                         {currentView === "find_friends" && <FindFrinds />}
                         {currentView === "profile" && <Profile />}
@@ -43,6 +44,8 @@ export const Chatbox = () => {
                                 setCurrentChatView={setCurrentChatView} 
                                 currentChatView={currentChatView} 
                                 setIncomingMessage={setIncomingMessage}
+                                typingIndicator={typingIndicator}
+                                setTypingIndicator={setTypingIndicator}
                             />
                         )
                       

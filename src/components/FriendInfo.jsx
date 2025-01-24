@@ -1,10 +1,13 @@
 import PropTypes from "prop-types"
 import { useState } from "react"
+import { toast } from "react-toastify"
 
-const FriendInfo = ({f, loading, setShowFriendInfo}) => {
+const FriendInfo = ({f, loading, setShowFriendInfo, messages, previewImage, setPreviewImage}) => {
 
 
     const [activeTab, setActiveTab] = useState("media")
+    
+
   return (
     <div className='friend_info_data'>
         <div className="close_state">
@@ -23,7 +26,7 @@ const FriendInfo = ({f, loading, setShowFriendInfo}) => {
                             (f.profile.profile_picture ? (
                                 <img src={`http://localhost:8000${f.profile.profile_picture}`} alt={`${f.username}'s profile`} />
                             ) : (
-                                <div className="no_profile i">{f.username[0].toUpperCase()}</div>
+                                <div className="no_profile i" style={{cursor:'pointer'}} onClick={() => toast.info("no profile")} >{f.username[0].toUpperCase()}</div>
                             ))  
                             )}
                         </div>
@@ -64,8 +67,8 @@ const FriendInfo = ({f, loading, setShowFriendInfo}) => {
 
             <div className="media">
                 <div className="chat_media">
-                    <div className="tab">
-                        <div className="media-tab">
+                    <div className="tabs">
+                        <div className="media-tab tab">
                             <button onClick={() => setActiveTab("media")}>
                                 <span>
                                     <i className="bi bi-images"></i>
@@ -75,18 +78,35 @@ const FriendInfo = ({f, loading, setShowFriendInfo}) => {
                                 </span>
                             </button>
                         </div>
+                        
                     </div>
 
                     {activeTab === "media" && (
                         <div className="media-files">
                             <div className="med_file">
-                                
+                                <div className="media_flex-grid">
+                                {messages.map((media) => (
+                                    (media.media && 
+                                        <div key={media.id} onClick={() => setPreviewImage(media.media)} className="media_image">
+                                            {media.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                                <img src={`http://localhost:8000${media.media}/`} alt="media" />
+                                            ) : (
+                                                <video src={`http://localhost:8000${media.media}/`}></video>
+                                            )}
+                                            
+                                        </div>
+                                    )
+                                ))}
+                                    
+                                </div>
                             </div>
                         </div>
                     ) }
                 </div>
             </div>
         </div>
+
+        
     </div>
   )
 }
@@ -98,11 +118,12 @@ FriendInfo.propTypes = {
         username: PropTypes.string.isRequired,
         email: PropTypes.string.isRequired,
         profile: PropTypes.shape({
-            bio: PropTypes.string.isRequired,
-            profile_picture: PropTypes.string.isRequired,
-            cover_picture: PropTypes.string.isRequired,
+            bio: PropTypes.string,
+            profile_picture: PropTypes.string,
+            cover_picture: PropTypes.string,
         })
     }),
+    messages: PropTypes.array
 }
 
 export default FriendInfo

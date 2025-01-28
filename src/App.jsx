@@ -54,11 +54,31 @@ function App() {
 
   const routes = useMemo(() => (
     <Routes>
-        <Route path='/' element={ token ? <Chatbox />  : <Login /> } />
-        <Route path='/auth/register' element={ <Register /> } />
-        <Route path='/reset-password' element={ <RequestPassword /> } />
-        <Route path='/email-done' element={ <EmailSent /> } />
-        <Route path='*' element={<Navigate to={"/"} />} />
+
+       {
+          token ?
+          (
+            <>
+              <Route path='/' element={ <Chatbox />  } />
+              <Route path='*' element={<Navigate to={"/"} />} />
+            </>
+          )
+          :
+          (
+            <>
+              <Route path='/auth/login' element={ <Login />} />
+              <Route path='/auth/register' element={ <Register /> } />
+              <Route path='/reset-password' element={ <RequestPassword /> } />
+              <Route path='/email-done' element={ <EmailSent /> } />
+              <Route path='*' element={<Navigate to={"/auth/login"} />} />
+            </>
+            
+          )
+            
+      }
+
+        
+        
     </Routes>
   ), [token])
 

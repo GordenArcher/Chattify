@@ -482,7 +482,7 @@
     border-radius: 4px;
 }
 
-.choose_options{
+.choose_options, .logout_options{
     width: 100%;
     justify-content: space-around;
     margin-top: 50px;
@@ -510,4 +510,50 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
+}
+
+.show_logout{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 99;
+    background: hsla(0, 0%, 0%, 0.595);
+}
+
+.modalogO{
+    max-width: 600px;
+    margin: 100px auto;
+    height: auto;
+    padding: 30px;
+    background: hsl(0, 0%, 100%);
+    border-radius: 8px;
+}
+
+.log_off_pop{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal_txt{
+    color: hsla(0, 0%, 0%);
+    font-size: 1.5rem;
+    line-height: 2;
+    text-align: center;
+    font-weight: 700;
+}
+
+.logout_options{
+    display: flex;
+    flex-direction: row;
+}
+
+.logout_options .logO button{
+    color: hsl(0, 0%, 100%);
+}
+
+.logout_options .yex button{
+    background: hsl(0, 100%, 50%);
 }

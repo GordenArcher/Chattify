@@ -4,7 +4,7 @@ import { GetUserProfile } from '../utils/hooks/GetProfile'
 import { useContext } from 'react'
 import { AuthContext } from '../utils/contexts/AuthContextProvider'
 
-export const LeftTab = ({ setCurrentView }) => {
+export const LeftTab = ({ setCurrentView, setShowLogOut }) => {
 
     const {user, usersDataDet} = GetUserProfile()
     const {notificationCount} = useContext(AuthContext)
@@ -49,13 +49,22 @@ export const LeftTab = ({ setCurrentView }) => {
             </div>
 
             <div className="flowBottom">
-                <div className="settings">
+
+                <div className="logout">
+                    <div className="logouticon">
+                        <button onClick={() => setShowLogOut(true)}>
+                            <i className="bi bi-box-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {/* <div className="settings">
                     <div className="settingsicon">
                         <button onClick={() => setCurrentView("settings")}>
                             <i className='bi bi-gear'></i>
                         </button>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="profile">
                     <div className="profileimage" onClick={() => setCurrentView("profile")}>
@@ -75,5 +84,6 @@ export const LeftTab = ({ setCurrentView }) => {
 
 LeftTab.propTypes = {
     setCurrentView: PropTypes.func.isRequired,
-    notificationCount: PropTypes.number
+    notificationCount: PropTypes.number,
+    setShowLogOut: PropTypes.func
 }

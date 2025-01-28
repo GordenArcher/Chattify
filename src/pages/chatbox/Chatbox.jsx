@@ -1,9 +1,9 @@
-import {useEffect, useRef, useState, useCallback, useContext } from "react"
+import {useEffect, useRef, useState, useCallback, useContext, } from "react"
 import { Leftbox } from "./Leftbox"
 import { MainViewChat } from "./MainViewChat"
 import '../../assets/CSS/chatbox.css'
 import { LeftTab } from "../../components/LeftTab"
-import { Settings } from "../Settings"
+// import { Settings } from "../Settings"
 import FindFrinds from "./FindFrinds"
 import Profile from "./Profile"
 import Selected from "../../components/!Selected"
@@ -12,9 +12,12 @@ import AppIcon from '../../assets/images/G-KANAD.jpg';
 import { AuthContext } from "../../utils/contexts/AuthContextProvider"
 import { toast } from "react-toastify"
 import { GetUserProfile } from "../../utils/hooks/GetProfile"
+import { useNavigate } from "react-router-dom"
+import { Load } from "../../components/Load"
 
 
 export const Chatbox = () => {
+  const [showLogOut, setShowLogOut] = useState(false)
     const [currentView, setCurrentView] = useState("chat");
     const [currentChatView, setCurrentChatView] = useState("");
     const [typingIndicator, setTypingIndicator] = useState(null)
@@ -23,6 +26,9 @@ export const Chatbox = () => {
     const [message, setMessage] = useState("")
     const websocketRef = useRef(null);
     const [u, setU] = useState()
+
+    const navigate = useNavigate()
+    const [isLoading, setIsLoading] = useState(false)
 
     const { usersDataDet } = GetUserProfile()
 
@@ -191,12 +197,45 @@ export const Chatbox = () => {
         }
       }
 
+      const logoutUser = async () => {
+        setIsLoading(true)
+    
+        try {
+          const response = await fetch("http://localhost:8000/api/auth/logout/", {method:"POST", headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Token ${token}`,
+          }})
+      
+          if(response.ok){
+            const data = await response.json()
+            localStorage.removeItem("token")
+            setShowLogOut(false)
+            toast.success(data.message)
+            
+            setTimeout(() => {
+              navigate('/auth/login')
+            },3000)
+            
+            
+          }else{
+            const errordata = await response.json()
+            console.log(errordata)
+          }
+        } catch (error) {
+          console.log(error)
+        }finally{
+          setIsLoading(false)
+        }
+    
+        
+      }
+
   return (
     <div className="chatbox">
         <div className="boxcontainer">
             <div className="chatwrapper">
                 <div className="tabi">
-                    <LeftTab setCurrentView={setCurrentView}/>
+                    <LeftTab setCurrentView={setCurrentView} setShowLogOut={setShowLogOut}/>
                 </div>
 
                 <div className="leftbox">
@@ -207,7 +246,7 @@ export const Chatbox = () => {
                         setCurrentView={setCurrentView} 
                         setCurrentChatView={setCurrentChatView} 
                         />}
-                        {currentView === "settings" && <Settings />}
+                        {/* {currentView === "settings" && <Settings />} */}
                         {currentView === "find_friends" && <FindFrinds />} 
                         {currentView === "profile" && <Profile />}
                         {currentView === "notification" && <Notification />}
@@ -240,6 +279,29 @@ export const Chatbox = () => {
                 </div>
             </div>
         </div>
+
+        {showLogOut && (
+          <div className="show_logout">
+            <div className="modalogO">
+              <div className="log_off_pop">
+                <div className="modal_txt">
+                  <span>Are you sure you want to <br /> log-out ? </span>
+                </div>
+
+                <div className="logout_options">
+                  <div className="cancel_no logO">
+                    <button onClick={() => setShowLogOut(false)} >No</button>
+                  </div>
+
+                  <div className="yex logO">
+                    <button onClick={logoutUser}>{isLoading ? <Load /> : 'Yes! Logout'}</button>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   )
 }

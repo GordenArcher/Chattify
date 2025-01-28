@@ -2,7 +2,7 @@ import RecievedRequest from "../../components/RecievedRequest"
 import { FetchRecievedRequest } from "../../utils/hooks/FetchRequests"
 import PropTypes from "prop-types"
 
-const Notification = () => {
+const Notifications = () => {
 
     const { received, isLoading, setReceived} = FetchRecievedRequest()
 
@@ -50,4 +50,4 @@ Notification.propTypes = {
     setReceived: PropTypes.func
 }
 
-export default Notification
+export default Notifications

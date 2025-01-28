@@ -51,8 +51,6 @@ function App() {
       }
       
   }, [token, url, setIsError, setIsLoading, setusersData])
-  
-  
 
   const routes = useMemo(() => (
     <Routes>

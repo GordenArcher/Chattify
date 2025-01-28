@@ -53,7 +53,7 @@ export const AuthContextProvider = ({children}) => {
         setIsLoadingFriends,
         isLoadingFriends,
         messages,
-        setMessages
+        setMessages,
         }}>
         {children}
     </AuthContext.Provider>

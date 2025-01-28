@@ -1,9 +1,8 @@
 import PropTypes from "prop-types"
 import { useRef } from "react";
 
-const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage, typingIndicator }) => {
-    const date = new Date(incomingMessage.timestamp)
-    const formattedTime = `${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`;
+const UserCard = ({ friend, setCurrentChatView, highlight, typingIndicator }) => {
+
     const display = useRef(null)
 
     return (
@@ -25,7 +24,7 @@ const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage, typi
                     </div>
                     {typingIndicator === friend.from_user.username && ("typing") }
 
-                    {friend.from_user.username === incomingMessage.sender || incomingMessage.recipient === friend.from_user.username ? (
+                    {/* {friend.from_user.username === incomingMessage.sender || incomingMessage.recipient === friend.from_user.username ? (
                         (incomingMessage.message ? (
                             <div className="messageOverview">
                                 <div className="vieww">
@@ -47,19 +46,20 @@ const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage, typi
                         ) : (
                             null
                         )
-                    }
+                    } */}
                     
                 </div>
 
             </div>
             
-            {incomingMessage.sender === friend.from_user.username  &&  (
+            {/* {friend.from_user.username === incomingMessage.sender &&  (
                 <div className="leftmessoverview">
                     <div className="messTime">
                         <div className="Timeset">
                             {incomingMessage.message && <p>{formattedTime}</p>}
                         </div>
 
+                    
                         <div className="messNum">
                             {incomingMessage.incomingMessageCount && 
                             <div className="numcount">
@@ -70,7 +70,7 @@ const UserCard = ({ friend, setCurrentChatView, highlight, incomingMessage, typi
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
             
         </div>
     )
@@ -95,5 +95,5 @@ UserCard.propTypes = {
         })
         
     }).isRequired,
-    typingIndicator: PropTypes.string
+    typingIndicator: PropTypes.string,
 };

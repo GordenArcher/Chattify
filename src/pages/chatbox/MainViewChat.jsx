@@ -1,23 +1,30 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import '../../assets/css/mainview.css';
 import '../../assets/CSS/ch.css'
 import EmojiPicker from 'emoji-picker-react';
 import PropTypes from 'prop-types';
-import { AuthContext } from '../../utils/contexts/AuthContextProvider';
 import FriendInfo from '../../components/FriendInfo';
 import { U } from '../../utils/hooks/FetchUsers';
-import AppIcon from '../../assets/images/G-KANAD.jpg';
-import { toast } from 'react-toastify';
+import { AuthContext } from '../../utils/contexts/AuthContextProvider';
+import { Load } from '../../components/Load';
 
-export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingMessage, typingIndicator, setTypingIndicator }) => {
-  const [message, setMessage] = useState("")
+export const MainViewChat = ({ 
+  currentChatView, 
+  setCurrentChatView, 
+  typingIndicator, 
+  websocketRef, 
+  sendMessages, 
+  mediaPreview, 
+  setMediaPreview,
+  setMediaMessage,
+  messageChange,
+  message,
+  setMessage
+
+ }) => {
   const [status, setStatus] = useState("")
-  const [mediaPreview, setMediaPreview] = useState(null)
-  const [mediaMessage, setMediaMessage] = useState("")
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
-  const websocket = useRef(null)
-  const { token, setMessages, messages } = useContext(AuthContext)
   const [showOptions, setShowOptions] = useState(false)
   const {data, loading} = U(currentChatView)
   const [friendProfile, setFriendProfile] = useState({})
@@ -26,6 +33,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
   const messagesEndRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null)
   const [showMsgOpt, setShowMsgOpt] = useState(false)
+  const { setMessages, messages } = useContext(AuthContext)
 
   useEffect(() => {
     setFriendProfile(data?.profile)
@@ -39,112 +47,7 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    if(Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
   }, []);
-
-
-  const showNotification = (sender, message) => {
-    if (Notification.permission === "granted") {
-        new Notification(`New message from ${sender}`, {
-            body: message,
-            icon: AppIcon,
-        });
-    } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                new Notification(`New message from ${sender}`, {
-                    body: message,
-                    icon: AppIcon,
-                });
-            }
-        });
-    }
-  }
-
-    const CHAT_BASE_URL = "localhost:8000"
-    
-    useEffect(() => {
-
-    websocket.current = new WebSocket(`ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}/?token=${token}`)
-
-    websocket.current.onopen = () => {
-      console.log("websockets opened")
-    }
-
-    websocket.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    
-      setTimeout(() => {
-        console.log("Attempting to reconnect...");
-        if (websocket.current.readyState !== WebSocket.CLOSED) {
-          websocket.current.close();
-        }
-    
-        websocket.current = new WebSocket(`ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}/?token=${token}`);
-        
-        websocket.current.onopen = () => {
-          console.log("WebSocket connection reopened.");
-        };
-    
-        websocket.current.onmessage = (message) => {
-          console.log("Message received:", message);
-          // Add your message-handling logic here
-        };
-    
-        websocket.current.onerror = (err) => {
-          console.error("WebSocket error after reconnect:", err);
-        };
-    
-      }, 2000);
-    };
-    
-    let typingTimeout;
-    websocket.current.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-
-        if (data.type === 'typing') {
-          setTypingIndicator(data.loggedInUser)
-
-            if (typingTimeout) {
-              clearTimeout(typingTimeout);
-            }
-
-          typingTimeout = setTimeout(() => {
-              setTypingIndicator(""); 
-          }, 3000);
-        }
-
-        if(data.type === 'chat_message'){
-          setMessages((prevMessages) => {
-            const isDuplicate = prevMessages.some(
-              (message) => message.message_id === data.message_id
-            );
-            return isDuplicate ? prevMessages : [...prevMessages, data];
-          });
-          setIncomingMessage(data)
-          showNotification("Gorden", "Hiii");
-        }
-        else{
-          toast.error(data)
-        }
-
-        
-      } catch (error) {
-        console.error("Error parsing message data", error);
-      }
-    }
-
-    websocket.current.onclose = () => {
-      console.log("Websocket closed")
-    }
-    }, [currentChatView, setIncomingMessage, setMessages, token])
-
 
     const handleMediaChange = (e) => {
         const file = e.target.files[0]; 
@@ -158,39 +61,6 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
           reader.readAsDataURL(file); 
         }
       };
-
-    const sendMessages = (e) => {
-      e.preventDefault()
-  
-      if(mediaMessage) {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          const base64 = reader.result; 
-          websocket.current.send(
-            JSON.stringify({ 
-              type: "message",
-              "media": base64
-             })
-          );
-          setMediaMessage(null)
-          setMediaPreview(null)
-        };
-      
-        reader.readAsDataURL(mediaMessage);
-      } else {
-
-        if(!message.trim()) return toast.error("No message sent")
-
-        websocket.current.send(JSON.stringify({
-          type: "message", 
-          message 
-        }))
-
-        setMessage("")
-      }
-
-    }
 
   const togglePicker = () => {
     setShowPicker((prev) => !prev);
@@ -215,34 +85,41 @@ export const MainViewChat = ({ currentChatView, setCurrentChatView, setIncomingM
     }
   }, [])
 
-  
+  const scrollBtn = useRef(null);
+  const mainchatview = useRef(null);
 
-const messageChange = (e) => {
-  const newMessage = e.target.value; 
-  setMessage(newMessage); 
+  useEffect(() => {
+    const handleScroll = () => {
+      const atBottom = mainchatview.current.scrollHeight - mainchatview.current.scrollTop - mainchatview.current.clientHeight < 1500;
+      
+      if (!atBottom) {
+        scrollBtn.current.style.display = 'block';
+      } else {
+        scrollBtn.current.style.display = 'none';
+      }
+    };
 
-  if (websocket.current && websocket.current.readyState === WebSocket.OPEN) {
-    if (newMessage.length > 0) {
-      websocket.current.send(
-        JSON.stringify({
-          type: "typing",
-          typing: true,
-        })
-      );
-    } else {
-      websocket.current.send(
-        JSON.stringify({
-          type: "typing",
-          typing: false,
-        })
-      );
-    }
-  } else {
-    console.error("WebSocket is not open.");
-  }
-}
+    mainchatview.current.addEventListener("scroll", handleScroll);
+
+    return () => {
+      mainchatview.current.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const scrollToBottom = () => {
+    mainchatview.current.scrollTo({
+      top: mainchatview.current.scrollHeight,
+      behavior: 'smooth', 
+    });
+  };
 
   return (
+    <>
+    <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
+      <button onClick={scrollToBottom}>
+        <i className="bi bi-arrow-down"></i>
+      </button>
+    </div>
     <div className="userchat">
       <div className="userchatcontainer">
         <div className="chatcontent">
@@ -327,7 +204,7 @@ const messageChange = (e) => {
                       </div>
                     </div>
                     <div className="chat_user_actions">
-                      <div className="actions ud">
+                      <div className="actions_sh ud">
                         <button onClick={(e) => {
                           setShowOptions((currentOption) => !currentOption)
                           e.stopPropagation()}}>
@@ -374,88 +251,79 @@ const messageChange = (e) => {
               
             </div>
           </div>
-          <div className="mainchatview">
+          <div className="mainchatview" ref={mainchatview}>
             <div className="chatview">
               <div className="incoming">
                 <div className="cm">
-                    {messages.map((msg) => {
-                      const time = new Date(msg.timestamp || msg.sent_at)
-                      const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
-                      return (
-                        <div key={msg.id} className='inbox'>
-                          {friendProfile.id !== msg.user ? (
-                            <div className='sender msg'>
-                              <div className="box">
-                                <div className="msg_wrap">
-                                  <div className="msg_div">
+                  {loading ? (
+                    <Load />
+                  ) : (
+
+                    (messages.map((msg) => {
+                        const time = new Date(msg.sent_at)
+                        const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
+                        
+                        return (
+                          <div key={msg.id} className='inbox'>
+                            {currentChatView !== msg.recipient.username ? (
+                              <div className='sender msg'>
+                                <div className="box">
+                                  <div className="msg_wrap">
+                                    <div className="msg_div">
+                                      {msg.media ? (
+                                        (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                          <img draggable='false' src={`http://localhost:8000${msg.media}`} alt=""  onClick={() => setPreviewImage(msg.media)}/>
+                                        ) : (
+                                          <video src={`http://localhost:8000${msg.media}`} controls></video>
+                                          )
+                                        )
+                                      ) : (
+                                        <span>{msg.message}</span>
+                                      )}
+                                      
+                                    </div>
+                                  </div>
+  
+                                  <div className="msg_t">
+                                    <div className="msg_tst">
+                                      <p>{timestamp}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className='reciever msg'>
+                                <div className="box">
+                                  <div className="msg_wrap">
+                                    <div className="msg_div">
                                     {msg.media ? (
                                       (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-                                        <img draggable='false' src={`http://localhost:8000${msg.media}`} alt=""  onClick={() => setPreviewImage(msg.media)}/>
+                                        <img draggable='false' src={`http://localhost:8000${msg.media}`} onClick={() => setPreviewImage(msg.media)}/>
                                       ) : (
                                         <video src={`http://localhost:8000${msg.media}`} controls></video>
                                         )
                                       )
                                     ) : (
-                                      <span>{msg.message}</span>
-                                    )}
-                                    
+                                        <span>{msg.message}</span>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-
-                                <div className="msg_t">
-                                  <div className="msg_tst">
-                                    <p>{timestamp}</p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* <div className="message_opti">
-                                <button onClick={() => setShowMsgOpt(true)}>
-                                    <i className='bi bi-three-dots-vertical'></i>
-                                </button>
-                                <div className="mesg_optionns">
-                                  
-                                </div>
-                              </div> */}
-                            </div>
-                          ) : (
-                            <div className='reciever msg'>
-                              <div className="box">
-                                <div className="msg_wrap">
-                                  <div className="msg_div">
-                                  {msg.media ? (
-                                    (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-                                      <img draggable='false' src={`http://localhost:8000${msg.media}`} onClick={() => setPreviewImage(msg.media)}/>
-                                    ) : (
-                                      <video src={`http://localhost:8000${msg.media}`} controls></video>
-                                      )
-                                    )
-                                  ) : (
-                                      <span>{msg.message}</span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="msg_t">
-                                  <div className="msg_tst">
-                                    <p>{timestamp}</p>
+  
+                                  <div className="msg_t">
+                                    <div className="msg_tst">
+                                      <p>{timestamp}</p>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-
-                              {/* <div className="message_opti">
-                                <button onClick={() => setShowMsgOpt(true)}>
-                                    <i className='bi bi-three-dots-vertical'></i>
-                                </button>
-                                <div className="mesg_optionns">
-                                  
-                                </div> 
-                              </div> */}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
+                            )}
+                          </div>
+                        )
+                        
+                      })
+                    )
+                  )}
+                    
                 </div>
                 <div ref={messagesEndRef} />
               </div>
@@ -502,12 +370,12 @@ const messageChange = (e) => {
                       id="message"
                       value={message}
                       placeholder="Send a Message"
-                      onChange={messageChange}
+                      onChange={(e) => messageChange(e)}
                     />
                   </div>
 
                     <div className="send">
-                      <button ref={websocket} type="submit" onClick={sendMessages}>
+                      <button ref={websocketRef} type="submit" onClick={sendMessages}>
                         <i className="bi bi-send"></i>
                       </button>
                     </div>
@@ -558,6 +426,7 @@ const messageChange = (e) => {
   }
       
     </div>
+    </>
   );
 };
 
@@ -566,5 +435,14 @@ MainViewChat.propTypes = {
   setCurrentChatView : PropTypes.func.isRequired,
   setIncomingMessage: PropTypes.func,
   typingIndicator: PropTypes.string,
-  setTypingIndicator: PropTypes.func
+  setTypingIndicator: PropTypes.func,
+  websocketRef: PropTypes.object,
+  sendMessages: PropTypes.func,
+  mediaPreview: PropTypes.string,
+  setMediaPreview: PropTypes.func,
+  setMediaMessage: PropTypes.func,
+  mediaMessage: PropTypes.string,
+  setMessage: PropTypes.func,
+  message: PropTypes.string,
+  messageChange: PropTypes.func
 }

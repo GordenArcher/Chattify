@@ -8,6 +8,7 @@ import { UpdateEmail } from "../../api/UpdateData"
 const Profile = () => {
 
   const { user, loading, usersDataDet } = GetUserProfile()
+  console.log(user)
   const [isEditing, setIsEditing] = useState(false)
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [isEditingEmail, setIsEditingEmail] = useState(false)
@@ -24,7 +25,7 @@ const Profile = () => {
     profile_picture : null,
     cover_picture : null,
     email: "",
-    username: user?.username ? user.username: ""
+    username: user.username 
   })
 
   const { setProfileEmail } = UpdateEmail(setIsLoadingEmail, profileData.email, setIsEditingEmail)
@@ -86,7 +87,6 @@ const Profile = () => {
         },
         body: formData
       })
-      console.log(profileData.profile_picture)
   
       if(response.ok){
         const data = await response.json()
@@ -214,6 +214,7 @@ const Profile = () => {
                               ) : (
                                 <>
                                 <span>Bio</span>
+                                <p>{profileData.bio}</p>
                                 <h3>{user.profile?.bio ? user.profile?.bio : `Hello there, I'm ${usersDataDet}`}</h3>
                                 </>
                               )}

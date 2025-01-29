@@ -11,6 +11,7 @@ import { FetchRecievedRequest, FetchRequests } from './utils/hooks/FetchRequests
 import axios from 'axios';
 import RequestPassword from './pages/RequestPassword';
 import { EmailSent } from './pages/Email-Sent';
+import { ResetPassword } from './pages/ResetPassword';
 
 function App() {
   
@@ -69,6 +70,7 @@ function App() {
               <Route path='/auth/login' element={ <Login />} />
               <Route path='/auth/register' element={ <Register /> } />
               <Route path='/reset-password' element={ <RequestPassword /> } />
+              <Route path='/change-password' element={ <ResetPassword /> } />
               <Route path='/email-done' element={ <EmailSent /> } />
               <Route path='*' element={<Navigate to={"/auth/login"} />} />
             </>

@@ -46,9 +46,6 @@
     display: none;
 }
 
-.viewchat{
-    width: 70%;
-}
 
 .leftbox{
     width: 25%;
@@ -67,6 +64,7 @@
 
 .viewchat{
     height: 100vh;
+    width: 70%;
 }
 
 .leftchatboxwrap, .leftchatheader, .listswrap, .messTime, .use_del, .set_bio_cont,
@@ -556,4 +554,19 @@
 
 .logout_options .yex button{
     background: hsl(0, 100%, 50%);
+}
+
+@media screen and (max-width:786px) {
+    .tabi{
+        display: none;
+    }
+
+    .content, .leftbox{
+        width: 100%;
+    }
+
+    .leftbox{
+        border: none;
+    }
+
 }

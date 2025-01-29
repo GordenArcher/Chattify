@@ -26,6 +26,7 @@ export const Chatbox = () => {
     const [message, setMessage] = useState("")
     const websocketRef = useRef(null);
     const [u, setU] = useState()
+    const [isMobileView, setIsMobileView] = useState(false);
 
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
@@ -230,6 +231,35 @@ export const Chatbox = () => {
         
       }
 
+      useEffect(() => {
+        const checkMobileView = () => {
+          if (window.innerWidth <= 800) {
+            setIsMobileView(true);
+          } else {
+            setIsMobileView(false);
+          }
+        };
+    
+        checkMobileView();
+        window.addEventListener("resize", checkMobileView);
+    
+        return () => window.removeEventListener("resize", checkMobileView);
+      }, []);
+
+      const one = {
+        display:currentChatView === "" ? "block" : "none",
+        opacity:currentChatView === "" ? 1 : 0, 
+        pointerEvents:currentChatView === "" ? "auto" : "none",
+        transition: "opacity 0.3s ease",
+      }
+
+      const two = {
+        display: currentChatView !== "" ? "block" : "none",
+        opacity: currentChatView !== "" ? 1 : 0, 
+        pointerEvents: currentChatView !== "" ? "auto" : "none", 
+        transition: "opacity 0.3s ease",
+      }
+
   return (
     <div className="chatbox">
         <div className="boxcontainer">
@@ -238,7 +268,7 @@ export const Chatbox = () => {
                     <LeftTab setCurrentView={setCurrentView} setShowLogOut={setShowLogOut}/>
                 </div>
 
-                <div className="leftbox">
+                <div className="leftbox"style={ isMobileView ? one : {}} >
                     <div className="content">
                         {currentView === "chat" && 
                         <Leftbox 
@@ -253,7 +283,7 @@ export const Chatbox = () => {
                     </div>
                 </div>
 
-                <div className="viewchat">
+                <div className="viewchat" style={ isMobileView ? two : {} }>
                     {
                         currentChatView === "" ?
                         (<Selected />)

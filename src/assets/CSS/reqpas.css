@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+    justify-content: center;
     gap: 30px;
 }
 
@@ -141,7 +142,6 @@
     transform: translateY(-2px);
 }
 
-/* From Uiverse.io by BHARGAVPATEL1244 */ 
 .sent_request button {
     outline: none;
     cursor: pointer;
@@ -160,7 +160,7 @@
     border-radius: 6px;
     overflow: hidden;
     background: #ffffff;
-    color: ghostwhite;
+    color: hsl(0, 0%, 100%);
 }
    
 .sent_request button span {
@@ -196,3 +196,27 @@
     transform: translate3d(100%, 0, 0);
 }
    
+
+@media screen and (max-width:786px) {
+    .request_wrapper{
+        flex-direction: column;
+    }
+
+    .right_mess{
+        font-size: .4rem;
+    }
+
+    .reset_left_image{
+        width: 70%;
+    }
+
+    .reset_left_image img{
+        width: 100%;
+        height: 100%;
+    }
+
+    .sent_mess{
+        margin-top: 40px;
+        font-size: .8rem;
+    }
+}

@@ -85,15 +85,11 @@ export const ResetPassword = () => {
                                                 setPassword(e.target.value)
                                             }} />
 
-                                            <button>
-                                                <i className="bi bi-shield-lock"></i>
-                                            </button>
-
                                             {password.length > 6 ? null : <p style={{color:'red'}}>Password should be more than 6</p>}
                                         </div>
 
                                         <div className="sent_request">
-                                            <button>{isLoading ? <Load /> : 'Reset'}</button>
+                                            <button>{isLoading ? <Load /> : <span>Reset</span>}</button>
                                         </div>
                                     </div>
                                 </form>

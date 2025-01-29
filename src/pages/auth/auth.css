@@ -154,3 +154,42 @@
 .loginbutton button:hover{
     background: hsla(241, 97%, 24%, 0.586);
 }
+
+@media screen and (max-width:786px) {
+    .loginWrap, .registerContainer{
+        flex-direction: column;
+    }
+
+    .leftWrapper{
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .leftHeader h1{
+        font-size: 2rem;
+    }
+
+    .leftimage, .left-image{
+        display: none;
+    }
+
+    .appLine{
+        display: none;
+    }
+
+    .loginform{
+        margin-top: 20px;
+    }
+
+    .bghead{
+        font-size: 1rem;
+    }
+
+    .inputs{
+        gap: 10px;
+    }
+
+    .s-text{
+        display: none;
+    }
+}

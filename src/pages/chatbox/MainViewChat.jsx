@@ -101,9 +101,7 @@ export const MainViewChat = ({
 
     mainchatview.current.addEventListener("scroll", handleScroll);
 
-    return () => {
-      mainchatview.current.removeEventListener("scroll", handleScroll);
-    };
+
   }, []);
 
   const scrollToBottom = () => {
@@ -115,13 +113,14 @@ export const MainViewChat = ({
 
   return (
     <>
-    <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
+   
+    <div className="userchat">
+      <div className="userchatcontainer" style={{position:'relative'}}>
+      <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
       <button onClick={scrollToBottom}>
         <i className="bi bi-arrow-down"></i>
       </button>
     </div>
-    <div className="userchat">
-      <div className="userchatcontainer">
         <div className="chatcontent">
           <div className="chathead">
             <div className="chat_banner">
@@ -265,7 +264,7 @@ export const MainViewChat = ({
                         
                         return (
                           <div key={msg.id} className='inbox'>
-                            {currentChatView !== msg.recipient.username ? (
+                            {currentChatView !== msg.user ? (
                               <div className='sender msg'>
                                 <div className="box">
                                   <div className="msg_wrap">

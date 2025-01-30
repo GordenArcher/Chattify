@@ -15,7 +15,6 @@ import { GetUserProfile } from "../../utils/hooks/GetProfile"
 import { useNavigate } from "react-router-dom"
 import { Load } from "../../components/Load"
 import Tabs from "../../components/Tabs"
-import { motion } from "framer-motion"
 
 
 export const Chatbox = () => {

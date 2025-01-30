@@ -7,6 +7,9 @@ import FriendInfo from '../../components/FriendInfo';
 import { U } from '../../utils/hooks/FetchUsers';
 import { AuthContext } from '../../utils/contexts/AuthContextProvider';
 import { Load } from '../../components/Load';
+import { motion } from "framer-motion";
+import Lottie from "lottie-react";
+import wavingAnimation from '../../assets/images/json/Animation - 1738248290524.json'
 
 export const MainViewChat = ({ 
   currentChatView, 
@@ -34,6 +37,7 @@ export const MainViewChat = ({
   const [previewImage, setPreviewImage] = useState(null)
   const [showMsgOpt, setShowMsgOpt] = useState(false)
   const { setMessages, messages } = useContext(AuthContext)
+  const messageRefs = useRef({});
 
   useEffect(() => {
     setFriendProfile(data?.profile)
@@ -101,7 +105,6 @@ export const MainViewChat = ({
 
     mainchatview.current.addEventListener("scroll", handleScroll);
 
-
   }, []);
 
   const scrollToBottom = () => {
@@ -111,16 +114,53 @@ export const MainViewChat = ({
     });
   };
 
+  const scrollToMessage = (messageId) => {
+    const messageElement = messageRefs.current[messageId];
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  const handleChatSearchInput = (e) => {
+    const search = e.target.value;
+    setSearchChatInput(search);
+  
+    if (search.trim() === '') {
+      setMessages(messages);
+      return;
+    }
+  
+    const filtered = messages.map((msg) => {
+      const isMatch = msg.message.toLowerCase().includes(search.toLowerCase());
+      return {
+        ...msg,
+        highlight: isMatch,
+      };
+    });
+  
+    if (JSON.stringify(filtered) !== JSON.stringify(messages)) {
+      setMessages(filtered);
+  
+      const firstMatchedMessage = filtered.find(msg => msg.highlight);
+      if (firstMatchedMessage) {
+        scrollToMessage(firstMatchedMessage.id);
+      }
+    }
+  };
+
   return (
     <>
    
     <div className="userchat">
       <div className="userchatcontainer" style={{position:'relative'}}>
-      <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
-      <button onClick={scrollToBottom}>
-        <i className="bi bi-arrow-down"></i>
-      </button>
-    </div>
+        {messages !== 0 &&
+        <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
+          <button onClick={scrollToBottom}>
+            <i className="bi bi-arrow-down"></i>
+          </button>
+        </div>
+        }
+      
         <div className="chatcontent">
           <div className="chathead">
             <div className="chat_banner">
@@ -133,7 +173,7 @@ export const MainViewChat = ({
                         type="text"
                         id='chat-search'
                         value={searchChatInput}
-                        onChange={(e) => setSearchChatInput(e.target.value)}
+                        onChange={handleChatSearchInput}
                         placeholder='Search for a specific text'
                         />
 
@@ -153,44 +193,52 @@ export const MainViewChat = ({
                 <div className="h_banner">
                 <div className="friend_banner_details">
                   <div className="banner_user_details">
-                  <div className="h_banner_u" onClick={() => setShowFriendInfo(true)}>
-                    <div className="banner_image_profile">
-                      {friendProfile ? (
-                          (friendProfile.profile?.profile_picture ? (
-                              <div className='friendProfile fp'>
-                                <img src={`http://localhost:8000${friendProfile.profile?.profile_picture}`} alt={`${friendProfile.username}'s profile`}/>
-                              </div>
-                            ) : (
-                              
-                              <div className='no_profile'>
-                                {currentChatView[0].toUpperCase()}
-                              </div>
-                            ))
-                      ) : (
-                        <div className='no_profile'>
-                          {currentChatView[0].toUpperCase()}
-                        </div>
-                      )}
-                    
-                      
+                    <div className="bac_lis">
+                        <button onClick={() => setCurrentChatView("")}>
+                          <i className='bi bi-arrow-left'></i>
+                        </button>
                     </div>
-                    <div className="h_user_details">
-                      <div className="banner_username">
-                          <div className="b_u_name">
-                            <h4>{currentChatView}</h4>
-                          </div>
 
-                          <div className="online_status">
-                            <div className="state">
-                              {typingIndicator === currentChatView && 
-                              <span>typing...</span>
-                              }
-                              
-                            </div>
+                    <div className="h_banner_u" onClick={() => setShowFriendInfo(true)}>
+                      <div className="banner_image_profile">
+                        
+                        {friendProfile ? (
+                            (friendProfile.profile?.profile_picture ? (
+                                <div className='friendProfile fp'>
+                                  <img src={`http://localhost:8000${friendProfile.profile?.profile_picture}`} alt={`${friendProfile.username}'s profile`}/>
+                                </div>
+                              ) : (
+                                
+                                <div className='no_profile'>
+                                  {currentChatView[0].toUpperCase()}
+                                </div>
+                              ))
+                        ) : (
+                          <div className='no_profile'>
+                            {currentChatView[0].toUpperCase()}
                           </div>
+                        )}
+                      
+                        
+                      </div>
+                      <div className="h_user_details">
+                        <div className="banner_username">
+                            <div className="b_u_name">
+                              <h4>{currentChatView}</h4>
+                            </div>
+
+                            <div className="online_status">
+                              <div className="state">
+                                {typingIndicator === currentChatView && 
+                                <span>typing...</span>
+                                }
+                                
+                              </div>
+                            </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+
                   </div>
                   <div className="banner_del">
                     <div className="search_chat">
@@ -256,33 +304,31 @@ export const MainViewChat = ({
                 <div className="cm">
                   {loading ? (
                     <Load />
-                  ) : (
-
-                    (messages.map((msg) => {
-                        const time = new Date(msg.sent_at)
-                        const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
-                        
-                        return (
-                          <div key={msg.id} className='inbox'>
+                  ) :
+                    (messages.length > 0 ? (
+                      (messages.map((msg) => {
+                          const time = new Date(msg.sent_at)
+                          const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
+                          
+                          return (
+                            <div key={msg.id} className='inbox'>
                             {currentChatView !== msg.user ? (
-                              <div className='sender msg'>
+                              <div ref={(el) => messageRefs.current[msg.id] = el} className='sender msg'>
                                 <div className="box">
                                   <div className="msg_wrap">
-                                    <div className="msg_div">
+                                    <div className={`msg_div ${msg.highlight ? "highlighted" : ""}`}>
                                       {msg.media ? (
                                         (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-                                          <img draggable='false' src={`http://localhost:8000${msg.media}`} alt=""  onClick={() => setPreviewImage(msg.media)}/>
+                                          <img draggable='false' src={`http://localhost:8000${msg.media}`} alt="" onClick={() => setPreviewImage(msg.media)} />
                                         ) : (
                                           <video src={`http://localhost:8000${msg.media}`} controls></video>
-                                          )
-                                        )
+                                        ))
                                       ) : (
-                                        <span>{msg.message}</span>
+                                        <span className="">{msg.message}</span> 
                                       )}
-                                      
                                     </div>
                                   </div>
-  
+                          
                                   <div className="msg_t">
                                     <div className="msg_tst">
                                       <p>{timestamp}</p>
@@ -291,23 +337,22 @@ export const MainViewChat = ({
                                 </div>
                               </div>
                             ) : (
-                              <div className='reciever msg'>
+                              <div ref={(el) => messageRefs.current[msg.id] = el} className='reciever msg'>
                                 <div className="box">
                                   <div className="msg_wrap">
-                                    <div className="msg_div">
-                                    {msg.media ? (
-                                      (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-                                        <img draggable='false' src={`http://localhost:8000${msg.media}`} onClick={() => setPreviewImage(msg.media)}/>
+                                    <div className={`msg_div ${msg.highlight ? "highlighted" : ""}`}>
+                                      {msg.media ? (
+                                        (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                          <img draggable='false' src={`http://localhost:8000${msg.media}`} onClick={() => setPreviewImage(msg.media)} />
+                                        ) : (
+                                          <video src={`http://localhost:8000${msg.media}`} controls></video>
+                                        ))
                                       ) : (
-                                        <video src={`http://localhost:8000${msg.media}`} controls></video>
-                                        )
-                                      )
-                                    ) : (
-                                        <span>{msg.message}</span>
+                                        <span className="">{msg.message}</span> 
                                       )}
                                     </div>
                                   </div>
-  
+                          
                                   <div className="msg_t">
                                     <div className="msg_tst">
                                       <p>{timestamp}</p>
@@ -317,10 +362,23 @@ export const MainViewChat = ({
                               </div>
                             )}
                           </div>
-                        )
-                        
-                      })
-                    )
+                          
+                            
+                          )
+                          
+                        })
+                      )
+                    ) : (
+                      <div className='empty_chat'>
+                        <div style={{ width: 300, height: 300 }}>
+                          <Lottie animationData={wavingAnimation} loop={true} />
+                        </div>
+
+                        <div className="message">
+                          <h4>👀 Looks quiet here... Break the silence with a message!</h4>
+                        </div>
+                      </div>
+                    )   
                   )}
                     
                 </div>
@@ -389,12 +447,24 @@ export const MainViewChat = ({
             )}
         </div>
       </div>
-      {
-        showFriendInfo &&
-       <div className='side'>
-          <FriendInfo messages={messages} previewImage={previewImage} setPreviewImage={setPreviewImage} f={friendProfile} setShowFriendInfo={setShowFriendInfo} loading={loading} />
-       </div>
-      }
+      { showFriendInfo && (
+    <motion.div 
+        className='side'
+        initial={{ x: "50%", opacity: 0 }} 
+        animate={{ x: 0, opacity: 1 }} 
+        exit={{ x: "50%", opacity: 0 }}
+        transition={{ duration: 0.5, ease: "easeInOut" }} 
+    >
+        <FriendInfo 
+            messages={messages} 
+            previewImage={previewImage} 
+            setPreviewImage={setPreviewImage} 
+            f={friendProfile} 
+            setShowFriendInfo={setShowFriendInfo} 
+            loading={loading} 
+        />
+    </motion.div>
+)}
 
   {previewImage && 
       <div className="preview_image_click">

@@ -82,9 +82,26 @@
     background: hsl(207, 95%, 8%);
 }
 
-.lefthead, .search_head, .notification_head{
+.lefthead h3, .search_head, .notification_head{
     font-size: 2rem;
     font-weight: 800;
+}
+
+.lefthead{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.f_frr{
+    display: none;
+}
+
+.f_frr button{
+    background: none;
+    font-size: 1.8rem;
+    color: hsl(0, 0%, 100%);
 }
 
 .searchlistfriends, .searc, .recieved_title {
@@ -556,6 +573,84 @@
     background: hsl(0, 100%, 50%);
 }
 
+.mobile_tabs {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: none;
+}
+  
+.m_tabs {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+}
+  
+.m_tabs button {
+    background: transparent;
+    border: none;
+    color: #888;
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+  
+.m_tabs button {
+    font-size: 1.5rem;
+}
+  
+.m_tabs button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+  
+.m_tabs button.active {
+    background: linear-gradient(135deg, hsla(241, 97%, 24%, 0.365), hsl(207, 95%, 8%));
+    color: white;
+    border-radius: 50%;
+    box-shadow: 0px 4px 10px hsl(207, 95%, 8%);
+    transform: scale(1.15);
+}
+  
+  .notification_m-icon {
+    position: relative;
+  }
+  
+  .noti-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+
 @media screen and (max-width:786px) {
     .tabi{
         display: none;
@@ -569,4 +664,31 @@
         border: none;
     }
 
+    .f_frr{
+        display: block;
+    }
+
+    .side{
+        width: 100%;
+        position: absolute;
+        left: 0;
+        background: hsl(207, 95%, 8%);
+        z-index: 9;
+    }
+
+    .mobile_tabs{
+        display: block;
+    }
+
+    .boxcontainer{
+        position: relative;
+        padding-bottom: 80px;
+}
+
+}
+
+@media screen and (max-width:400px) {
+    .lefthead h3{
+        font-size: 1.5rem;
+    }
 }

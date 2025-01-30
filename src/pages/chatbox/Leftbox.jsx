@@ -25,6 +25,12 @@ export const Leftbox = ({ setCurrentChatView,
             <div className="leftchatheader">
                 <div className="lefthead">     
                     <h3>Chattify</h3>
+
+                    <div className="f_frr">
+                        <button onClick={() => setCurrentView("find_friends")}>
+                            <i className='bi bi-person-plus'></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="leftsearchlist">

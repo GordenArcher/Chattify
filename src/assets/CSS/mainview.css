@@ -1,6 +1,7 @@
 .userchat, .userchatcontainer, .chatcontent, .mainchatview, .searc_friend_chat,
 .chatview, .messagecontent, .no_chat_selected, .no-select-wrap, .no-container,
-.errorFri, .h_banner, .friend_banner_details, .serach_chat, .search__c, .msg{
+.errorFri, .h_banner, .friend_banner_details, .serach_chat, .search__c, .msg,
+.empty_chat{
     width: 100%;
     height: 100%;
 }
@@ -19,6 +20,32 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+}
+
+.banner_user_details{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bac_lis{
+    padding: 10px;
+    margin-left: -20px;
+    display: none;
+}
+
+.bac_lis button{
+    width: 10px;
+    background: transparent;
+    padding: 0;
+}
+
+.bac_lis button i{
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(0, 0%, 100%);
 }
 
 .h_banner_u, .banner_del{
@@ -409,7 +436,21 @@
     color: hsl(0, 0%, 100%);
 }
 
-@media screen and (max-width:800px) {
+.empty_chat{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.highlighted {
+    background-color: yellow;
+    color: hsl(0, 0%, 0%);
+    transition: background-color 0.5s ease-in-out;
+  }
+
+@media screen and (max-width: 769px) {
     .viewchat{
         width: 100%;
     }
@@ -451,5 +492,28 @@
         font-size: 1.1rem;
         outline: none;
         transition: .3s ease;
+    }
+
+    .scrol_but button{
+        width: 40px;
+        height: 40px;
+    }
+
+    .scrol_but button i{
+        font-size: 1.5rem;
+    }
+    .bac_lis{
+        display: block;
+    }
+}
+
+@media screen and (max-width:400px) {
+    .scrol_but button{
+        width: 30px;
+        height: 30px;
+    }
+
+    .scrol_but button i{
+        font-size: 1rem;
     }
 }

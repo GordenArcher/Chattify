@@ -124,5 +124,5 @@ export const Leftbox = ({ setCurrentChatView,
 Leftbox.propTypes = {
     setCurrentChatView: PropTypes.func.isRequired,
     setCurrentView: PropTypes.func.isRequired,
-    typingIndicator: PropTypes.string,
+    typingIndicator: PropTypes.object,
 }

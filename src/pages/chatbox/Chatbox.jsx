@@ -21,7 +21,7 @@ export const Chatbox = () => {
   const [showLogOut, setShowLogOut] = useState(false)
     const [currentView, setCurrentView] = useState("chat");
     const [currentChatView, setCurrentChatView] = useState("");
-    const [typingIndicator, setTypingIndicator] = useState(null)
+    const [typingIndicator, setTypingIndicator] = useState({})
     const [mediaPreview, setMediaPreview] = useState(null)
     const [mediaMessage, setMediaMessage] = useState("")
     const [message, setMessage] = useState("")
@@ -70,49 +70,85 @@ export const Chatbox = () => {
     }, []);
 
   
-    const typing = useCallback((data) => {
-      setTypingIndicator(data);
-  
-      if (websocketRef.current.typingTimeout) {
-        clearTimeout(websocketRef.current.typingTimeout);
-      }
-  
-      websocketRef.current.typingTimeout = setTimeout(() => {
-        setTypingIndicator("");
-      }, 2000);
-    }, [setTypingIndicator, websocketRef]);
-  
+    // const typing = useCallback((data) => {
+    //   setTypingIndicator(prev => ({ ...prev, [data.loggedInUser]: true }));
+    
+    //   if (websocketRef.current.typingTimeout) {
+    //     clearTimeout(websocketRef.current.typingTimeout);
+    //   }
+    
+    //   websocketRef.current.typingTimeout = setTimeout(() => {
+    //     setTypingIndicator(prev => {
+    //       const updated = { ...prev };
+    //       delete updated[data.loggedInUser];
+    //       return updated;
+    //     });
+    //   }, 2000);
+    // }, []);
 
     const handleWebSocketMessage = useCallback(
       (e) => {
         try {
           const data = JSON.parse(e.data);
-          // console.log(data)
-  
-          if (data.type === "typing") {
-            typing(data.loggedInUser);
+    
+          
+          if (data.type === "typing" && data.loggedInUser) {
+            console.log("Typing event:", data);
+            
+            setTypingIndicator(prev => ({
+              ...prev,
+              [data.loggedInUser]: true, 
+            }));
+    
+            
+            if (websocketRef.current.typingTimeouts?.[data.loggedInUser]) {
+              clearTimeout(websocketRef.current.typingTimeouts[data.loggedInUser]);
+            }
+    
+            
+            if (!websocketRef.current.typingTimeouts) {
+              websocketRef.current.typingTimeouts = {};
+            }
+    
+           
+            websocketRef.current.typingTimeouts[data.loggedInUser] = setTimeout(() => {
+              setTypingIndicator(prev => {
+                const updated = { ...prev };
+                delete updated[data.loggedInUser];
+                return updated;
+              });
+            }, 2000);
           }
-  
+    
+          if (data.type === 'user_status') {
+            const { username, status } = data;
+            console.log(`${username} is ${status}`);
+        }
+
           if (data.type === "chat_message") {
+            console.log(data)
             setMessages((prevMessages) => {
               const isDuplicate = prevMessages.some(
                 (message) => message.message_id === data.message_id
               );
-              
+    
               return isDuplicate ? prevMessages : [...prevMessages, data];
-              
-            })
-            showNotification(data.sender, data.message);
+            });
+    
+            showNotification(data.user, data.message);
+            toast(data.user);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
         }
       },
-      [typing, setMessages, showNotification]
+      [setMessages, showNotification]
     );
+
+    
   
     useEffect(() => {
-        const inbox = currentChatView === "" ?  u : currentChatView
+      const inbox = "http://localhost:5173"
 
       const ws = new WebSocket(
         `ws://${CHAT_BASE_URL}/ws/chat/${inbox}/?token=${token}`
@@ -141,6 +177,20 @@ export const Chatbox = () => {
       };
     }, [currentChatView, token, handleWebSocketMessage, websocketRef, u]);
   
+
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        if (websocketRef && websocketRef.current.readyState === WebSocket.OPEN) {
+          
+          websocketRef.current.send(JSON.stringify({ type: 'heartbeat', online: true }));
+        }
+      }, 60000);
+  
+      return () => {
+        clearInterval(intervalId);
+      };
+
+    },[])
 
     const sendMessages = (e) => {
         e.preventDefault()
@@ -184,13 +234,6 @@ export const Chatbox = () => {
               JSON.stringify({
                 type: "typing",
                 typing: true,
-              })
-            )
-          } else {
-            websocketRef.current.send(
-              JSON.stringify({
-                type: "typing",
-                typing: false,
               })
             )
           }

@@ -3,6 +3,8 @@ import { useRef } from "react";
 
 const UserCard = ({ friend, setCurrentChatView, highlight, typingIndicator }) => {
 
+    // const lastMessage
+
     const display = useRef(null)
 
     return (
@@ -22,7 +24,7 @@ const UserCard = ({ friend, setCurrentChatView, highlight, typingIndicator }) =>
                     <div className="friendname">
                         <h3 style={{ fontWeight: highlight ? 'bold' : 'normal' }}>{friend.from_user.username}</h3>
                     </div>
-                    {typingIndicator === friend.from_user.username && ("typing") }
+                    {typingIndicator[friend.from_user.username] && <span>typing...</span>}
 
                     {/* {friend.from_user.username === incomingMessage.sender || incomingMessage.recipient === friend.from_user.username ? (
                         (incomingMessage.message ? (
@@ -95,5 +97,5 @@ UserCard.propTypes = {
         })
         
     }).isRequired,
-    typingIndicator: PropTypes.string,
+    typingIndicator: PropTypes.object,
 };

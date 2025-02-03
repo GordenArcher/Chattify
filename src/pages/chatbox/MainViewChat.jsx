@@ -23,9 +23,7 @@ export const MainViewChat = ({
   messageChange,
   message,
   setMessage
-
  }) => {
-  const [status, setStatus] = useState("")
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
   const [showOptions, setShowOptions] = useState(false)
@@ -46,7 +44,6 @@ export const MainViewChat = ({
       const sortedMessages = [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
       setMessages(sortedMessages);
     }
-    setStatus("Online")
   }, [data.profile, data.messages, setMessages])
 
   useEffect(() => {
@@ -229,10 +226,7 @@ export const MainViewChat = ({
 
                             <div className="online_status">
                               <div className="state">
-                                {typingIndicator === currentChatView && 
-                                <span>typing...</span>
-                                }
-                                
+                              {typingIndicator[currentChatView] && <span>typing...</span>}
                               </div>
                             </div>
                         </div>
@@ -503,8 +497,7 @@ MainViewChat.propTypes = {
   currentChatView: PropTypes.string.isRequired,  
   setCurrentChatView : PropTypes.func.isRequired,
   setIncomingMessage: PropTypes.func,
-  typingIndicator: PropTypes.string,
-  setTypingIndicator: PropTypes.func,
+  typingIndicator: PropTypes.object,
   websocketRef: PropTypes.object,
   sendMessages: PropTypes.func,
   mediaPreview: PropTypes.string,

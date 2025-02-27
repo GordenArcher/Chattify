@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthContextProvider } from './utils/contexts/AuthContextProvider.jsx'
 import { LazyLoad } from './components/LazyLoad.jsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const App = lazy(() => import('./App.jsx'))
 
@@ -14,11 +15,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
     <AuthContextProvider>
-      <QueryClientProvider client={client}>
-        <Suspense fallback={<LazyLoad />}>
-        <App />
-      </Suspense>
-      </QueryClientProvider>
+      <GoogleOAuthProvider>
+        <QueryClientProvider client={client}>
+          <Suspense fallback={<LazyLoad />}>
+          <App />
+        </Suspense>
+        </QueryClientProvider>
+      </GoogleOAuthProvider>
     </AuthContextProvider>
     </BrowserRouter>
     

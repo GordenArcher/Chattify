@@ -15,34 +15,10 @@ import { ResetPassword } from './pages/ResetPassword';
 
 function App() {
   
-  const { isAuthenticated, setIsAuthenticated, setReceived,setIsLoading, setusersData, setIsError, setFriends } = useContext(AuthContext)
+  const { isAuthenticated, setReceived,setIsLoading, setusersData, setIsError, setFriends } = useContext(AuthContext)
   const { received } = FetchRecievedRequest()
   const { users } = FetchRequests()
   const url = import.meta.env.VITE_API_URL
-
-  useEffect(() => {
-
-    const getAuthenticated = async () => {
-        try {
-            const response = await fetch(`${url}api/isAuthenticated/`, {method:"GET", credentials:"include"})
-
-            if(response.ok){
-                const data = await response.json()
-                console.log(data)
-                setIsAuthenticated(true)
-            }else{
-                const err = await response.json()
-                console.log(err)
-            }
-
-        } catch (error){
-            console.log(error)
-        }
-    }
-
-    getAuthenticated()
-
-}, [url, setIsAuthenticated])
 
   useEffect(() => {
     setReceived(received)

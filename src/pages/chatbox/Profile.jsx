@@ -1,8 +1,7 @@
-import { useContext, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { Load } from "../../components/Load"
 import { GetUserProfile } from "../../utils/hooks/GetProfile"
 import { toast } from "react-toastify"
-import { AuthContext } from "../../utils/contexts/AuthContextProvider"
 import { UpdateEmail } from "../../api/UpdateData"
 
 const Profile = () => {
@@ -17,16 +16,21 @@ const Profile = () => {
   const [IsLoadingProfile, setIsLoadingProfile] = useState(false)
   const [profilePreview, setProfilePreview] = useState(null)
   const [showPopUPR, setShowPopUPR] = useState(false)
+  const [setModalPosition] = useState({ x: 0, y: 0 });
   const [isError, setIsError] = useState(null)
-  const { token } = useContext(AuthContext)
   const point = useRef(null)
   const [profileData, setProfileData] = useState({
-    bio: user.payload?.bio,
-    profile_picture : null,
-    cover_picture : null,
-    email: "",
-    username: user.username 
+    bio: user.profile?.bio,
+    profile_picture : user.profile?.profile_picture,
+    cover_picture : user.profile?.cover_picture,
+    email: user?.email,
+    username: user?.username
   })
+
+  console.log(profileData)
+  console.log(user)
+
+  const BASE_URL = import.meta.env.VITE_API_URL
 
   const { setProfileEmail } = UpdateEmail(setIsLoadingEmail, profileData.email, setIsEditingEmail)
 
@@ -38,12 +42,12 @@ const Profile = () => {
 
     setIsLoading(true)
     try {
-      const response = await fetch("http://localhost:8000/api/set_profile/", {
+      const response = await fetch(`${BASE_URL}/api/set_profile/`, {
         method: 'POST',
         headers: {
           "Content-Type":"application/json",
-          "Authorization":`Token ${token}`
         },
+        credentials:"include",
         body: JSON.stringify({'bio':profileData.bio})
       })
   
@@ -83,8 +87,8 @@ const Profile = () => {
         method: 'POST',
         headers: {
           "Content-Type":"application/json",
-          "Authorization":`Token ${token}`
         },
+        credentials:"include",
         body: formData
       })
   
@@ -104,10 +108,16 @@ const Profile = () => {
   }
 
   const showChild = (e) => {
-    const x = e.screenX
-    const y = e.screenY
-    console.log(x,y)
+    setModalPosition({ x: e.clientX, y: e.clientY });
   }
+
+  // <div
+  //         className="modal"
+  //         style={{
+  //           top: `${modalPosition.y}px`,
+  //           left: `${modalPosition.x}px`,
+  //         }}
+  //       ></div>
 
   const PreviewProfile = (e) => {
     const file = e.target.files[0]
@@ -131,51 +141,38 @@ const Profile = () => {
     <div className="Profile">
       <div className="user_profile">
         <div className="profile_wrap">
-          <div className="user_profile_container">
-            <div className="user_images">
-              <div className="user_cover_image">
-                <div ref={point} className="cover_image" onClick={showChild}>
-                  {loading ? 
-                    (
-                      "Loading......" 
-
-                    )
-                    : (
-                      (user.profile?.cover_picture ? (
-                      <img src={`http://localhost:8000${user.profile?.cover_picture}`} alt="User" />
-                    ) : (
-                      <div className="no_cover">No Cover Image</div>
-                    ))
-                    )}
-                </div>
-              </div>
-
-                <div className="user_profile_image">
-                  <div className="profile_picture">
-                    {loading ? 
-                    (
-                      "Loading......" 
-
-                    )
-                    : (
-                      (user.profile?.profile_picture ? (
-                      <img src={`http://localhost:8000${user.profile?.profile_picture}`} alt="User" />
-                    ) : (
-                      <div className="no_profile i">{usersDataDet.charAt(0).toUpperCase()}</div>
-                    ))
-                    )}
-                    
-                      <div className="pop_sel_profile_ii">
-                      <button onClick={() => setShowPopUPR(true)}>
-                        <i className="bi bi-images"></i>
-                      </button>
+          {loading ? (
+            "Loading...."
+          ) : (
+            <div className="user_profile_container">
+              <div className="user_images">
+                <div className="user_cover_image">
+                  <div ref={point} className="cover_image" onClick={showChild}>
+                    {profileData.cover_picture ? (
+                        <img src={`${BASE_URL}${profileData.cover_picture}`} alt="User" />
+                      ) : (
+                        <div className="no_cover">No Cover Image</div>
+                      )}
                     </div>
                   </div>
 
-                  
-                </div>
+                  <div className="user_profile_image">
+                    <div className="profile_picture">
+                      {profileData.profile_picture ? (
+                        <img src={`${BASE_URL}${profileData.profile_picture}`} alt="User" />
+                      ) : (
+                        <div className="no_profile i">{usersDataDet.charAt(0).toUpperCase()}</div>
+                      )}
+                      
+                      <div className="pop_sel_profile_ii">
+                        <button onClick={() => setShowPopUPR(true)}>
+                          <i className="bi bi-images"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
-            </div> 
+              </div> 
 
             <div className="users_details">
               <div className="user_profile_details">
@@ -183,43 +180,11 @@ const Profile = () => {
                   <div className="users_bio">
                     <div className="us_bio">
                       <div className="bio">
-                        {isEditing ? (
-                          <div className="bio_edit">
-                            <div className="set_bio">
-                              <div className="set_bio_cont">
-                                <div className="set_bio_input">
-                                  <textarea 
-                                  onChange={(e) => 
-                                    setProfileData((currentState) => ({...currentState, bio: e.target.value}))
-                                  } 
-                                  name="bio" 
-                                  id="bio" 
-                                  aria-description="this the area for the user's to enter their bio" 
-                                  aria-label="user's bio" 
-                                  value={profileData.bio}></textarea>
-                                </div>
-
-                                <div className="set_bio_button op">
-                                  <button className="canc" onClick={() => setIsEditing(false)}>Cancel</button>
-                                  <button onClick={setProfile}>{isIsLoading ? <Load />: "Update"}</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
                           <div className="u_bio rt">
                             <div className="user_bio_info h">
-                              {loading ? (
-                                "Loading..."
-                              ) : (
-                                <>
-                                <span>Bio</span>
-                                <p>{profileData.bio}</p>
-                                <h3>{user.profile?.bio ? user.profile?.bio : `Hello there, I'm ${usersDataDet}`}</h3>
-                                </>
-                              )}
+                              <span>Bio</span>
+                              <h3>{profileData.bio ? profileData.bio : `Hello there, I'm ${usersDataDet}`}</h3>
                             </div>
-
 
                             <div className="edit_b">
                               <button onClick={() => setIsEditing((currentEdit => !currentEdit))}>
@@ -227,34 +192,12 @@ const Profile = () => {
                               </button>
                             </div>
                           </div>
-                        )}
                       </div>
                     </div>
                   </div>
 
                   <div className="user_username_wrap">
                     <div className="user_name">
-                      {isEditingUsername ? (
-                        <div className="set_username">
-                          <div className="se_us_name">
-                            <div className="s_username_f">
-                              <input 
-                              type="text" 
-                              name="username" 
-                              id="username" 
-                              value={profileData.username} 
-                              onChange={(e) => 
-                              setIsEditingUsername(e.target.value)
-                              } />
-                            </div>
-
-                            <div className="set_username_button op">
-                              <button className="canc" onClick={() => setIsEditingUsername(false)}>Cancel</button>
-                              <button>{isIsLoading ? <Load />: "Update"}</button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
                         <div className="u_username rt">
                           <div className="s_usern h">
                             <span>Username</span>
@@ -267,32 +210,11 @@ const Profile = () => {
                             </button>
                           </div>
                         </div>
-                      )}
-                      
                     </div>
                   </div>
 
                   <div className="user-email">
                     <div className="s_us_email">
-                      {isEditingEmail ? (
-                        <div className="set_email">
-                          <div className="se_us_mail">
-                            <div className="s_email_f">
-                              <input 
-                              type="text" 
-                              name="email" 
-                              id="email" 
-                              value={profileData.email} 
-                              onChange={(e) => setProfileData((currentState) => ({...currentState, email:e.target.value})) }/>
-                            </div>
-
-                            <div className="set_email_button op">
-                              <button className="canc" onClick={() => setIsEditingEmail(false)}>Cancel</button>
-                              <button onClick={setProfileEmail}>{IsLoadingEmail ? <Load />: "Update"}</button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
                         <div className="user_email rt">
                           <div className="_user_email h">
                             <span>Email</span>
@@ -305,14 +227,14 @@ const Profile = () => {
                             </button>
                             </div>
                         </div>
-                      )}
-                      
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          )}
+          
         </div>
       </div>
     </div>

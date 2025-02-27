@@ -10,7 +10,7 @@ export const Login = () => {
     
     const [viewPassword, setViewPassword] = useState(false)
     const [loader, setLoader] = useState(false)
-    const { saveToken } = useContext(AuthContext)
+    const { setIsAuthenticated } = useContext(AuthContext)
 
     const navigate = useNavigate()
 
@@ -47,22 +47,22 @@ export const Login = () => {
                 headers: {
                     "Content-Type":"application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     username : LoginData.username,
                     password : LoginData.password,
                 })
             })
+            console.log("Response Headers:", response.headers);
 
             if(response.ok){
                 const data = await response.json()
-                if(data.status === 'success'){
                 setLoader(false)
-                toast.success(data.message);
-                saveToken(data.token)
+                setIsAuthenticated(true)
+                toast.success(data.sucess);
                 setTimeout(() => {
                     navigate('/chat')
-                }, 2000)    
-                }
+                }, 2000)
                 
             }
             else{

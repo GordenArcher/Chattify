@@ -22,7 +22,8 @@ export const MainViewChat = ({
   setMediaMessage,
   messageChange,
   message,
-  setMessage
+  setMessage,
+  userStatus
  }) => {
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
@@ -36,6 +37,7 @@ export const MainViewChat = ({
   const [showMsgOpt, setShowMsgOpt] = useState(false)
   const { setMessages, messages } = useContext(AuthContext)
   const messageRefs = useRef({});
+  console.log(userStatus)
 
   useEffect(() => {
     setFriendProfile(data?.profile)
@@ -223,10 +225,14 @@ export const MainViewChat = ({
                             <div className="b_u_name">
                               <h4>{currentChatView}</h4>
                             </div>
-
+                            
                             <div className="online_status">
+                              <div className="status__" style={{display: typingIndicator[currentChatView] ? "none": "block"}}>
+                                  {userStatus.user === currentChatView && <span style={{fontSize:".8rem", fontWeight:"700"}}>{`${userStatus.Ostatus}`}</span>}
+                              </div>
+
                               <div className="state">
-                              {typingIndicator[currentChatView] && <span>typing...</span>}
+                                {typingIndicator[currentChatView] && <span>typing...</span>}
                               </div>
                             </div>
                         </div>

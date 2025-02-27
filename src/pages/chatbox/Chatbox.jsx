@@ -28,6 +28,10 @@ export const Chatbox = () => {
     const websocketRef = useRef(null);
     const [u, setU] = useState()
     const [isMobileView, setIsMobileView] = useState(false);
+    const [userStatus, setUserStatus] = useState({
+      user: "",
+      Ostatus:""
+    });
 
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
@@ -49,7 +53,7 @@ export const Chatbox = () => {
     
 
     const CHAT_BASE_URL = "localhost:8000";
-    const { token, setMessages } = useContext(AuthContext);
+    const { setMessages } = useContext(AuthContext);
   
     const showNotification = useCallback((sender, message) => {
       if (Notification.permission === "granted") {
@@ -69,23 +73,6 @@ export const Chatbox = () => {
       }
     }, []);
 
-  
-    // const typing = useCallback((data) => {
-    //   setTypingIndicator(prev => ({ ...prev, [data.loggedInUser]: true }));
-    
-    //   if (websocketRef.current.typingTimeout) {
-    //     clearTimeout(websocketRef.current.typingTimeout);
-    //   }
-    
-    //   websocketRef.current.typingTimeout = setTimeout(() => {
-    //     setTypingIndicator(prev => {
-    //       const updated = { ...prev };
-    //       delete updated[data.loggedInUser];
-    //       return updated;
-    //     });
-    //   }, 2000);
-    // }, []);
-
     const handleWebSocketMessage = useCallback(
       (e) => {
         try {
@@ -99,7 +86,6 @@ export const Chatbox = () => {
               ...prev,
               [data.loggedInUser]: true, 
             }));
-    
             
             if (websocketRef.current.typingTimeouts?.[data.loggedInUser]) {
               clearTimeout(websocketRef.current.typingTimeouts[data.loggedInUser]);
@@ -122,8 +108,10 @@ export const Chatbox = () => {
     
           if (data.type === 'user_status') {
             const { username, status } = data;
-            console.log(`${username} is ${status}`);
+            setUserStatus((prevDel) => ({...prevDel, user:username, Ostatus: status}))
         }
+
+        console.log(userStatus)
 
           if (data.type === "chat_message") {
             console.log(data)
@@ -142,16 +130,25 @@ export const Chatbox = () => {
           console.error("Error parsing WebSocket message:", error);
         }
       },
-      [setMessages, showNotification]
+      [setMessages, showNotification, userStatus]
     );
 
-    
+    function getCookie(name) {
+      const cookies = document.cookie.split('; ');
+      for (let cookie of cookies) {
+          const [key, value] = cookie.split('=');
+          if (key === name) return value;
+      }
+      return null;
+  }
   
     useEffect(() => {
+      const token = getCookie("access_token");
       const inbox = "http://localhost:5173"
 
       const ws = new WebSocket(
-        `ws://${CHAT_BASE_URL}/ws/chat/${inbox}/?token=${token}`
+        `ws://${CHAT_BASE_URL}/ws/chat/${currentChatView || "admin_gorden"}/?token=${token}`
+        // ``
       );
   
       websocketRef.current = ws;
@@ -175,7 +172,7 @@ export const Chatbox = () => {
           ws.close();
         }
       };
-    }, [currentChatView, token, handleWebSocketMessage, websocketRef, u]);
+    }, [currentChatView, handleWebSocketMessage, websocketRef, u]);
   
 
     useEffect(() => {
@@ -248,8 +245,8 @@ export const Chatbox = () => {
         try {
           const response = await fetch("http://localhost:8000/api/auth/logout/", {method:"POST", headers: {
             "Content-Type": "application/json",
-            "Authorization": `Token ${token}`,
-          }})
+          }, credentials:"include"}
+        )
       
           if(response.ok){
             const data = await response.json()
@@ -316,6 +313,7 @@ export const Chatbox = () => {
                     <div className="content">
                         {currentView === "chat" && 
                         <Leftbox 
+                        userStatus={userStatus}
                         typingIndicator={typingIndicator} 
                         setCurrentView={setCurrentView} 
                         setCurrentChatView={setCurrentChatView} 
@@ -345,6 +343,7 @@ export const Chatbox = () => {
                                 messageChange={messageChange}
                                 message={message}
                                 setMessage={setMessage}
+                                userStatus={userStatus}
                             />
                             
                         )

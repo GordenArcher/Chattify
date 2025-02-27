@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
-import { createContext, useState, useEffect } from 'react'
+import { createContext, useState } from 'react'
 
 export const AuthContext = createContext()
 
 export const AuthContextProvider = ({children}) => {
-    const [token, setToken] = useState("")
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [received, setReceived] = useState([])
     const [receivedLoading, setReceivedLoading] = useState(false)
     const [loading, setIsLoading] = useState(false)
@@ -16,24 +16,11 @@ export const AuthContextProvider = ({children}) => {
     const [friends, setFriends] = useState([])
     const [messages, setMessages] = useState([])
 
-    useEffect(() => {
-        const getuser = localStorage.getItem("token")
-
-        if(getuser){
-            setToken(getuser)
-        }
-    }, [])
-
-    const saveToken = (userToken) => {
-        localStorage.setItem("token", userToken)
-        setToken(userToken)
-    }
-
 
   return (
     <AuthContext.Provider value={{
-        saveToken, 
-        token, 
+        isAuthenticated, 
+        setIsAuthenticated,
         received, 
         setReceived,
         setReceivedLoading,

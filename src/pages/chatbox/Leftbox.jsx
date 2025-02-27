@@ -9,10 +9,12 @@ import { AuthContext } from '../../utils/contexts/AuthContextProvider'
 export const Leftbox = ({ setCurrentChatView, 
     setCurrentView, 
     typingIndicator,
+    userStatus
  }) => {
 
     const {friends, isLoadingFriends, errorFriend} = useContext(AuthContext)
     const [searchFriends, setSearchFriends] = useState("")
+    console.log(userStatus)
 
     const refresh = () => {
         location.reload()
@@ -70,7 +72,7 @@ export const Leftbox = ({ setCurrentChatView,
                             <FriendLoad />
                         ) : (
                         <div className="listswrap">
-                            {friends.length > 0 ? (
+                            {friends?.length > 0 ? (
                                 friends.map(friend => {
                                     const username = friend.from_user.username.toLowerCase()
                                     const search = searchFriends.toLowerCase();
@@ -125,4 +127,5 @@ Leftbox.propTypes = {
     setCurrentChatView: PropTypes.func.isRequired,
     setCurrentView: PropTypes.func.isRequired,
     typingIndicator: PropTypes.object,
+    userStatus: PropTypes.object,
 }

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react"
-import axios from "axios"
 import { AuthContext } from "../contexts/AuthContextProvider"
 
 export const GetUserProfile = () => {
@@ -8,20 +7,25 @@ export const GetUserProfile = () => {
     const [usersData, setusersData] = useState({})
     const [usersDataDet, setusersDataDet] = useState("")
     const [error, setIsError] = useState("")
-    const { token } = useContext(AuthContext)
+    const { isAuthenticated } = useContext(AuthContext)
 
-    const url = "http://127.0.0.1:8000/api/get_profile/"
+    const BASE_URL = import.meta.env.VITE_API_URL
+    const url = `${BASE_URL}api/get_profile/`
     useEffect(() => {
         
         const getProfile = async () => {
             setIsLoading(true)
 
             try {
-                const response = await axios.get(url, {headers: {"Authorization":`Token ${token}`}})
-                if (response.data.status === 'success') {
-                    setusersData(response.data);
-                    setusersDataDet(response.data.username)
+                const response = await fetch(url, {credentials:"include"})
+                if(response.ok){
+                    const data = await response.json()
+                    setusersData(data);
+                    setusersDataDet(data.username)
                     setIsLoading(false)  
+                }else{
+                    const err = await response.json()
+                    console.log(err)
                 }
                 
 
@@ -35,11 +39,11 @@ export const GetUserProfile = () => {
         }
         
 
-        if(token){
+        if(isAuthenticated){
             getProfile()
         }
         
-    }, [token])
+    }, [isAuthenticated, url])
 
 
   return {user: usersData, loading, error, usersDataDet}

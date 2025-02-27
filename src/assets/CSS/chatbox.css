@@ -68,7 +68,7 @@
 }
 
 .leftchatboxwrap, .leftchatheader, .listswrap, .messTime, .use_del, .set_bio_cont,
-.rt, .se_us_name, .se_us_mail, .s_friends, .find_friends_in, .all_users_search_wrap,
+.se_us_name, .se_us_mail, .s_friends, .find_friends_in, .all_users_search_wrap,
 .notify, .rec_rque_flex{
     display: flex;
     flex-direction: column;
@@ -319,6 +319,9 @@
 }
 
 .rt{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding-top: 40px;
 }
 
@@ -483,7 +486,19 @@
     padding: 30px;
     background: hsl(0, 0%, 100%);
     border-radius: 6px;
+    animation: zoomOut 0.3s ease-in-out;
 }
+
+@keyframes zoomOutC {
+    from {
+      transform: scale(0.7);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 
 .choose_profile_image{
     width: 100%;
@@ -541,10 +556,25 @@
     max-width: 600px;
     margin: 100px auto;
     height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 30px;
     background: hsl(0, 0%, 100%);
     border-radius: 8px;
+    animation: zoomOut 0.3s ease-in-out;
 }
+  
+  @keyframes zoomOut {
+    from {
+      transform: scale(0.7);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 
 .log_off_pop{
     display: flex;

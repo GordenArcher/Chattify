@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import { useRef } from "react";
 
-const UserCard = ({ friend, setCurrentChatView, highlight, typingIndicator }) => {
+const UserCard = ({ friend, setCurrentChatView, highlight, typingIndicator, }) => {
 
     // const lastMessage
 
@@ -24,6 +24,7 @@ const UserCard = ({ friend, setCurrentChatView, highlight, typingIndicator }) =>
                     <div className="friendname">
                         <h3 style={{ fontWeight: highlight ? 'bold' : 'normal' }}>{friend.from_user.username}</h3>
                     </div>
+                    
                     {typingIndicator[friend.from_user.username] && <span>typing...</span>}
 
                     {/* {friend.from_user.username === incomingMessage.sender || incomingMessage.recipient === friend.from_user.username ? (

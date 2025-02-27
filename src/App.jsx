@@ -15,19 +15,39 @@ import { ResetPassword } from './pages/ResetPassword';
 
 function App() {
   
-  const { token, setReceived,setIsLoading, setusersData, setIsError, setFriends } = useContext(AuthContext)
+  const { isAuthenticated, setIsAuthenticated, setReceived,setIsLoading, setusersData, setIsError, setFriends } = useContext(AuthContext)
   const { received } = FetchRecievedRequest()
   const { users } = FetchRequests()
+  const url = import.meta.env.VITE_API_URL
+
+  useEffect(() => {
+
+    const getAuthenticated = async () => {
+        try {
+            const response = await fetch(`${url}api/isAuthenticated/`, {method:"GET", credentials:"include"})
+
+            if(response.ok){
+                const data = await response.json()
+                console.log(data)
+                setIsAuthenticated(true)
+            }else{
+                const err = await response.json()
+                console.log(err)
+            }
+
+        } catch (error){
+            console.log(error)
+        }
+    }
+
+    getAuthenticated()
+
+}, [url, setIsAuthenticated])
 
   useEffect(() => {
     setReceived(received)
     setFriends(users)
   }, [setReceived, received, setFriends, users])
-
-
-  const BASE_URL = "http://127.0.0.1:8000/"
-
-  const url = `${BASE_URL}api/users/`
 
   useEffect(() => {
       
@@ -35,7 +55,7 @@ function App() {
           setIsLoading(true)
 
           try {
-              const response = await axios.get(url, {headers: {"Authorization":`Token ${token}`}})
+              const response = await axios.get(`${url}api/users/`, {withCredentials:true})
               setusersData(response.data.data.users)
               setIsLoading(false)
 
@@ -47,17 +67,18 @@ function App() {
           }
       }
 
-      if(token){
+      if(isAuthenticated){
           getAllUsers()
       }
       
-  }, [token, url, setIsError, setIsLoading, setusersData])
+  }, [isAuthenticated, url, setIsError, setIsLoading, setusersData])
+
 
   const routes = useMemo(() => (
     <Routes>
 
        {
-          token ?
+          isAuthenticated ?
           (
             <>
               <Route path='/' element={ <Chatbox />  } />
@@ -82,7 +103,7 @@ function App() {
         
         
     </Routes>
-  ), [token])
+  ), [isAuthenticated])
 
   return (
     <>

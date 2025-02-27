@@ -4,9 +4,10 @@ import { AuthContext } from '../contexts/AuthContextProvider'
 
 export const FetchRequests = () => {
 
-    const { token, setIsLoadingFriends, setErrorFriend } = useContext(AuthContext)
+    const { isAuthenticated, setIsLoadingFriends, setErrorFriend } = useContext(AuthContext)
 
-    const BASE_URL = "http://127.0.0.1:8000/api/friends/"
+    const url = import.meta.env.VITE_API_URL
+    const BASE_URL = `${url}api/friends/`
 
     const [friends, setFriends] = useState([])
 
@@ -17,7 +18,7 @@ export const FetchRequests = () => {
             setIsLoadingFriends(true)
     
             try {
-                const response = await axios.get(BASE_URL, {headers:{"Authorization":`Token ${token}`}})
+                const response = await axios.get(BASE_URL, {withCredentials:true})
 
                 if(response){
                     setErrorFriend(false)
@@ -33,9 +34,13 @@ export const FetchRequests = () => {
     
         }
 
-        getFriends()
+        if(isAuthenticated){
+           getFriends() 
+        }
 
-    }, [token, BASE_URL, setErrorFriend, setIsLoadingFriends, setFriends])
+        
+
+    }, [isAuthenticated, BASE_URL, setErrorFriend, setIsLoadingFriends, setFriends])
 
     return {users: friends}
 }
@@ -44,10 +49,10 @@ export const FetchRequests = () => {
 export const FetchRecievedRequest = () => {
 
     const [received, setReceived] = useState([])
-    const { token, setReceivedLoading, setNotificationCount } = useContext(AuthContext)
+    const { isAuthenticated, setReceivedLoading, setNotificationCount } = useContext(AuthContext)
     
-
-    const BASE_URL = "http://127.0.0.1:8000/api/recieved_request/"
+    const url = import.meta.env.VITE_API_URL
+    const BASE_URL = `${url}api/recieved_request/`
 
     useEffect(() => {
 
@@ -55,7 +60,7 @@ export const FetchRecievedRequest = () => {
 
             setReceivedLoading(true)
             try {
-                const response = await axios.get(BASE_URL, {headers:{"Authorization":`Token ${token}`}})
+                const response = await axios.get(BASE_URL, {withCredentials:true})
 
                 if(response){
                     setReceived(response.data.data)
@@ -70,9 +75,12 @@ export const FetchRecievedRequest = () => {
     
         }
 
-        getRecieved()
+        if(isAuthenticated){
+            getRecieved()
+        }
+        
 
-    }, [token, BASE_URL, setReceivedLoading, setNotificationCount])
+    }, [isAuthenticated, BASE_URL, setReceivedLoading, setNotificationCount])
 
     
   return { received, setReceived }

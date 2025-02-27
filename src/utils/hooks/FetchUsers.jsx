@@ -2,14 +2,14 @@ import { useContext, useEffect, useState } from "react"
 import axios from "axios"
 import { AuthContext } from "../contexts/AuthContextProvider"
 
-    const BASE_URL = "http://127.0.0.1:8000/"
+    const BASE_URL = import.meta.env.VITE_API_URL
 
 
 export const U = (username) => {
 
     const [loading, setIsLoading] = useState(false)
     const [data, setdata] = useState([])
-    const { token } = useContext(AuthContext)
+    const { isAuthenticated } = useContext(AuthContext)
 
 
     const url = `${BASE_URL}api/chat_messages/${username}`
@@ -19,13 +19,7 @@ export const U = (username) => {
             setIsLoading(true)
 
             try {
-                const response = await axios.get(url, 
-                    {"headers":{
-                        "Authorization":`Token ${token}`
-                        }
-                    },
-                    {withCredentials:true}
-                )
+                const response = await axios.get(url,{withCredentials:true})
     
                 if(response.statusText === 'OK'){
                     setdata(response.data.data)
@@ -40,10 +34,13 @@ export const U = (username) => {
             
         }
 
-        getUserChatMessage()
+        if(isAuthenticated){
+            getUserChatMessage()
+        }
+        
 
 
-    }, [token, url])
+    }, [isAuthenticated, url])
 
     return{data, loading}
 }

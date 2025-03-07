@@ -14,7 +14,6 @@ export const Leftbox = ({ setCurrentChatView,
 
     const {friends, isLoadingFriends, errorFriend} = useContext(AuthContext)
     const [searchFriends, setSearchFriends] = useState("")
-    console.log(userStatus)
 
     const refresh = () => {
         location.reload()

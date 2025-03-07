@@ -1,13 +1,12 @@
-import { useEffect, useRef, useState, useContext } from 'react';
+import { useEffect, useRef, useState, useContext, useMemo } from 'react';
 import '../../assets/css/mainview.css';
 import '../../assets/CSS/ch.css'
 import EmojiPicker from 'emoji-picker-react';
 import PropTypes from 'prop-types';
 import FriendInfo from '../../components/FriendInfo';
-import { U } from '../../utils/hooks/FetchUsers';
+import { UserChatMessages } from '../../utils/hooks/FetchUsers';
 import { AuthContext } from '../../utils/contexts/AuthContextProvider';
 import { Load } from '../../components/Load';
-import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import wavingAnimation from '../../assets/images/json/Animation - 1738248290524.json'
 
@@ -28,42 +27,42 @@ export const MainViewChat = ({
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
   const [showOptions, setShowOptions] = useState(false)
-  const {data, loading} = U(currentChatView)
+  const {data, isLoading} = UserChatMessages(currentChatView)
   const [friendProfile, setFriendProfile] = useState({})
   const [searchChat, setSearchChat] = useState(false)
   const [searchChatInput, setSearchChatInput] = useState("")
   const messagesEndRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null)
-  const [showMsgOpt, setShowMsgOpt] = useState(false)
   const { setMessages, messages } = useContext(AuthContext)
   const messageRefs = useRef({});
-  console.log(userStatus)
 
-  useEffect(() => {
-    setFriendProfile(data?.profile)
-
+  const sortedMessages = useMemo(() => {
     if (data?.messages) {
-      const sortedMessages = [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
-      setMessages(sortedMessages);
+      return [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
     }
-  }, [data.profile, data.messages, setMessages])
+  }, [data?.messages]);
+  
+  useEffect(() => {
+    setFriendProfile(data?.friend);
+    setMessages(sortedMessages || []);
+  }, [setMessages, data.friend, sortedMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-    const handleMediaChange = (e) => {
-        const file = e.target.files[0]; 
-        if (file) {
-          setMediaMessage(file);
-          
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setMediaPreview(reader.result);  
-          }
-          reader.readAsDataURL(file); 
+  const handleMediaChange = (e) => {
+      const file = e.target.files[0]; 
+      if (file) {
+        setMediaMessage(file);
+        
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setMediaPreview(reader.result);  
         }
-      };
+        reader.readAsDataURL(file); 
+      }
+    };
 
   const togglePicker = () => {
     setShowPicker((prev) => !prev);
@@ -78,7 +77,6 @@ export const MainViewChat = ({
     const closeEmogi = () => {
       setShowPicker(false)
       setShowOptions(false)
-      setShowMsgOpt(false)
     } 
 
     document.addEventListener("click", closeEmogi)
@@ -155,7 +153,9 @@ export const MainViewChat = ({
         {messages !== 0 &&
         <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
           <button onClick={scrollToBottom}>
-            <i className="bi bi-arrow-down"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chevron-down" viewBox="0 0 16 16">
+              <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+            </svg>
           </button>
         </div>
         }
@@ -302,7 +302,7 @@ export const MainViewChat = ({
             <div className="chatview">
               <div className="incoming">
                 <div className="cm">
-                  {loading ? (
+                  {isLoading ? (
                     <Load />
                   ) :
                     (messages.length > 0 ? (
@@ -448,22 +448,14 @@ export const MainViewChat = ({
         </div>
       </div>
       { showFriendInfo && (
-    <motion.div 
-        className='side'
-        initial={{ x: "50%", opacity: 0 }} 
-        animate={{ x: 0, opacity: 1 }} 
-        exit={{ x: "50%", opacity: 0 }}
-        transition={{ duration: 0.5, ease: "easeInOut" }} 
-    >
         <FriendInfo 
             messages={messages} 
             previewImage={previewImage} 
             setPreviewImage={setPreviewImage} 
             f={friendProfile} 
             setShowFriendInfo={setShowFriendInfo} 
-            loading={loading} 
+            loading={isLoading} 
         />
-    </motion.div>
 )}
 
   {previewImage && 
@@ -512,5 +504,6 @@ MainViewChat.propTypes = {
   mediaMessage: PropTypes.string,
   setMessage: PropTypes.func,
   message: PropTypes.string,
-  messageChange: PropTypes.func
+  messageChange: PropTypes.func,
+  userStatus: PropTypes.object
 }

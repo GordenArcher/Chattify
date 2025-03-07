@@ -8,47 +8,24 @@ import { Chatbox } from './pages/chatbox/Chatbox';
 import { useContext, useEffect, useMemo } from 'react';
 import { AuthContext } from './utils/contexts/AuthContextProvider';
 import { FetchRecievedRequest, FetchRequests } from './utils/hooks/FetchRequests';
-import axios from 'axios';
 import RequestPassword from './pages/RequestPassword';
 import { EmailSent } from './pages/Email-Sent';
 import { ResetPassword } from './pages/ResetPassword';
+import { GetUsers } from './api/UpdateData';
 
 function App() {
   
-  const { isAuthenticated, setReceived,setIsLoading, setusersData, setIsError, setFriends } = useContext(AuthContext)
+  const { isAuthenticated, setReceived, setFriends } = useContext(AuthContext)
   const { received } = FetchRecievedRequest()
   const { users } = FetchRequests()
-  const url = import.meta.env.VITE_API_URL
 
   useEffect(() => {
     setReceived(received)
     setFriends(users)
+    
   }, [setReceived, received, setFriends, users])
 
-  useEffect(() => {
-      
-      const getAllUsers = async () => {
-          setIsLoading(true)
-
-          try {
-              const response = await axios.get(`${url}api/users/`, {withCredentials:true})
-              setusersData(response.data.data.users)
-              setIsLoading(false)
-
-          } catch (error) {
-              console.log("error", error)
-              setIsError("Error Retrieving users")
-          }finally{
-              setIsLoading(false)
-          }
-      }
-
-      if(isAuthenticated){
-          getAllUsers()
-      }
-      
-  }, [isAuthenticated, url, setIsError, setIsLoading, setusersData])
-
+GetUsers()
 
   const routes = useMemo(() => (
     <Routes>

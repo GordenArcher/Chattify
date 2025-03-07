@@ -1,15 +1,22 @@
+import { motion } from "framer-motion"
 import PropTypes from "prop-types"
 import { useState } from "react"
 import { toast } from "react-toastify"
 
-const FriendInfo = ({f, loading, setShowFriendInfo, messages, previewImage, setPreviewImage}) => {
-
+const FriendInfo = ({f, isLoading, setShowFriendInfo, messages, previewImage, setPreviewImage}) => {
 
     const [activeTab, setActiveTab] = useState("media")
     
 
   return (
-    <div className='friend_info_data'>
+    <motion.div
+    className='side'
+    initial={{ x: "50%", opacity: 0 }} 
+    animate={{ x: 0, opacity: 1 }} 
+    exit={{ x: "50%", opacity: 0 }}
+    transition={{ duration: 0.5, ease: "easeInOut" }} 
+    >
+       <div className='friend_info_data'>
         <div className="close_state">
             <button id="close" onClick={() => setShowFriendInfo(false)}>
                 <i className="bi bi-x"></i>
@@ -20,7 +27,7 @@ const FriendInfo = ({f, loading, setShowFriendInfo, messages, previewImage, setP
                 <div className="firnd_iii">
                     <div className="info_profile_picture">
                         <div className="friend_profile profile_picture">
-                            {loading ? (
+                            {isLoading ? (
                                 <div className="loading">loading</div>
                             ) : (
                             (f.profile.profile_picture ? (
@@ -36,7 +43,7 @@ const FriendInfo = ({f, loading, setShowFriendInfo, messages, previewImage, setP
                         <div className="friend_n_bi">
                             <div className="friends_name">
                                 <div className="f_nameei">
-                                {loading ? (
+                                {isLoading ? (
                                         "Loading..."
                                     ) : (
                                         <span> {f.username} </span>
@@ -46,7 +53,7 @@ const FriendInfo = ({f, loading, setShowFriendInfo, messages, previewImage, setP
 
                             <div className="f_bio_n">
                                 <div className="f_oib">
-                                    {loading ? (
+                                    {isLoading ? (
                                         "Loading..."
                                     ) : (
                                     (f.profile.bio ? (
@@ -107,12 +114,14 @@ const FriendInfo = ({f, loading, setShowFriendInfo, messages, previewImage, setP
         </div>
 
         
-    </div>
+        </div> 
+    </motion.div>
+    
   )
 }
 
 FriendInfo.propTypes = {
-    loading: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
     setShowFriendInfo: PropTypes.func.isRequired,
     f: PropTypes.shape({
         username: PropTypes.string.isRequired,

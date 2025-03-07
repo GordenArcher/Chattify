@@ -111,8 +111,6 @@ export const Chatbox = () => {
             setUserStatus((prevDel) => ({...prevDel, user:username, Ostatus: status}))
         }
 
-        console.log(userStatus)
-
           if (data.type === "chat_message") {
             console.log(data)
             setMessages((prevMessages) => {
@@ -130,7 +128,7 @@ export const Chatbox = () => {
           console.error("Error parsing WebSocket message:", error);
         }
       },
-      [setMessages, showNotification, userStatus]
+      [setMessages, showNotification]
     );
 
     function getCookie(name) {
@@ -144,13 +142,14 @@ export const Chatbox = () => {
   
     useEffect(() => {
       const token = getCookie("access_token");
-      const inbox = "http://localhost:5173"
+      console.log(token)
+      console.log(document.cookie);
+      // const inbox = "http://localhost:5173"
 
       const ws = new WebSocket(
-        `ws://${CHAT_BASE_URL}/ws/chat/${currentChatView || "admin_gorden"}/?token=${token}`
-        // ``
-      );
+        `ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}`, null, {credentials: 'same-origin'});
   
+
       websocketRef.current = ws;
   
       ws.onopen = () => {

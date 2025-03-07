@@ -21,7 +21,7 @@ export const AuthContextProvider = ({children}) => {
     const refreshToken = useCallback(
         async () => {
           try {
-            const response = await fetch(`${url}api/auth/refresh/`, {
+            const response = await fetch(`${url}/auth/refresh/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -46,8 +46,8 @@ export const AuthContextProvider = ({children}) => {
       );
       
       const call_refresh = useCallback(
-        async (error, func) => {
-          if (error.response && error.response.status === 401) {
+        async (status, func) => {
+          if (status === 401) {
             const refreshed = await refreshToken();
             if (refreshed) {
               return func();
@@ -61,7 +61,7 @@ export const AuthContextProvider = ({children}) => {
       useEffect(() => {
         const getAuthenticated = async () => {
           try {
-            const response = await fetch(`${url}api/isAuthenticated/`, {
+            const response = await fetch(`${url}/isAuthenticated/`, {
               method: 'GET',
               credentials: 'include',
             });
@@ -70,8 +70,7 @@ export const AuthContextProvider = ({children}) => {
               const data = await response.json();
               setIsAuthenticated(data.auth);
             } else {
-              const err = await response.json();
-              console.log(err);
+              await call_refresh(response.status, getAuthenticated);
             }
           } catch (error) {
             await call_refresh(error, getAuthenticated);
@@ -80,11 +79,6 @@ export const AuthContextProvider = ({children}) => {
       
         getAuthenticated();
       }, [url, call_refresh]);
-      
-
-    // const refreshToken = () => {
-    //     const res = axios.post(`${url}ap`)
-    // }
 
 
   return (

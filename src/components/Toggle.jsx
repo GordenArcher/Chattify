@@ -1,12 +1,13 @@
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const Switch = () => {
+const Switch = ({ setViewPassword }) => {
 
   return (
     <StyledWrapper>
       <div className="cl-toggle-switch">
         <label className="cl-switch">
-          <input type="checkbox" />
+          <input type="checkbox" onChange={() => setViewPassword((prevState) => !prevState)} />
           <span />
         </label>
       </div>
@@ -128,3 +129,8 @@ const StyledWrapper = styled.div`
   }`;
 
 export default Switch;
+
+
+Switch.propTypes = {
+  setViewPassword: PropTypes.func
+}

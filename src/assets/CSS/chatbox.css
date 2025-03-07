@@ -9,7 +9,8 @@
 .bio_edit, .set_bio, .op, .user_bio_info, .rt, .edit_b, .no_cover, .user_username_wrap, .s_username_f,
 .s_email_f, .find-friends, .find_friends_in, .s_friends, .find_friends_wrap, .search_input,
 .searc, .user_container, .user_cont, .n_fie, .notification, .all_notification, .notify,
-.recieved_req, .rec_rque_flex, .choose_palace, .image_di, .sel{
+.recieved_req, .rec_rque_flex, .choose_palace, .image_di, .sel, .choose-cover, .image_cove,
+.update_profile, .choose_cover_image, .choose-cover, .cover_picture, .choose_c, .ed{
     width: 100%;
     height: 100%;
 }
@@ -322,7 +323,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 40px;
+    padding-top: 10px;
 }
 
 .user_bio_info, .s_usern, .no_user_email span{
@@ -410,7 +411,7 @@
     color: hsla(0, 100%, 50%, 0.588);
 }
 
-.n_fie, .c_pr_im{
+.n_fie{
     margin: 100px auto;
 }
 
@@ -451,18 +452,19 @@
     background: hsla(0, 0%, 0%, 0.595);
     z-index: 99;
     transition: all .9s ease;
+    overflow: auto;
 }
 
 .close_p_p{
     right: 20px;
     top: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
 
 .close_p_p button{
     padding: 10px;
     background: transparent;
-    color: hsl(0, 0%, 0%);
+    color: hsl(0, 0%, 100%);
     width: 45px;
     height: 45px;
     display: flex;
@@ -473,7 +475,7 @@
 }
 
 .close_p_p button:hover{
-    border: 1px solid hsla(0, 0%, 0%, 0.32);
+    border: 1px solid hsla(0, 0%, 100%, 0.32);
 }
 
 .close_p_p button i{
@@ -483,10 +485,11 @@
 .c_pr_im{
     position: relative;
     max-width: 500px;
-    padding: 30px;
-    background: hsl(0, 0%, 100%);
+    padding: 20px;
+    background: hsla(208, 95%, 8%);
     border-radius: 6px;
     animation: zoomOut 0.3s ease-in-out;
+    margin: auto;
 }
 
 @keyframes zoomOutC {
@@ -499,11 +502,6 @@
       opacity: 1;
     }
   }
-
-.choose_profile_image{
-    width: 100%;
-    height: 200px;
-}
 
 .choose_profile_image label{
     display: block;
@@ -526,19 +524,140 @@
     border: 1px solid hsla(0, 0%, 0%, 0.595);
 }
 
-.image_di{
+.image_di, .update_profile, .ch_imageee{
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
+.ch_imageee{
+    flex-direction: column;
+}
+
+.choose_cover_image{
+    position: relative;
+    height: 150px;
+}
+
+.cover_picture{
+    position: relative;
+    background: rgba(255, 255, 255, 0.302);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.image_cove img{
+    width: 100%;
+    height: 100%;
+}
+
+.profile_content_{
+    padding-top: 20px;
+}
+
+.content_edit_pf{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ed{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ed label{
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: hsla(0, 0%, 100%, 0.32);
+}
+
+.ed input{
+    width: 100%;
+    height: 55px;
+    padding: 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    border: 1px solid hsl(0, 0%, 100%);
+    border-radius: 6px;
+    outline: none;
+}
+
+.ed textarea{
+    padding: 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    background: transparent;
+    color: hsl(0, 0%, 100%);
+    border: 1px solid hsl(0, 0%, 100%);
+    border-radius: 6px;
+    outline: none;
+    resize: none;
+}
+
+.update_profile button {
+    color: hsl(0, 0%, 100%);
+    font-family: inherit;
+    display: inline-block;
+    width: 8em;
+    line-height: 2em;
+    margin: 20px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid hsla(0, 0%, 100%, 0.095);
+    background: transparent;
+    transition: color 0.5s;
+    z-index: 1;
+    font-size: 1.2rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+  
+.update_profile  button:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    background: hsl(241, 97%, 24%);
+    height: 150px;
+    width: 200px;
+    border-radius: 50%;
+  }
+  
+.update_profile button:hover {
+    color: #fff;
+}
+  
+  button:before {
+    top: 100%;
+    left: 100%;
+    transition: all 0.7s;
+}
+  
+.update_profile button:hover:before {
+    top: -30px;
+    left: -30px;
+}
+  
+.update_profile button:active:before {
+    background: hsl(241, 97%, 24%);
+    transition: background 0s;
+} 
 
 .sel{
     border: 1px dashed hsl(241, 97%, 24%);
 }
 
 .choose_palace img{
-    width: 180px;
-    height: 180px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
 }
 
@@ -662,7 +781,7 @@
   
   .notification_m-icon {
     position: relative;
-  }
+}
   
   .noti-count {
     position: absolute;
@@ -678,8 +797,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+}
   
+
 
 @media screen and (max-width:786px) {
     .tabi{

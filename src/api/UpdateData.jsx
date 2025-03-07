@@ -1,47 +1,36 @@
-import { useContext } from "react"
-import { toast } from "react-toastify"
-import { AuthContext } from "../utils/contexts/AuthContextProvider"
+import axios from 'axios'
+import { useContext, useEffect } from 'react'
+import { AuthContext } from '../utils/contexts/AuthContextProvider'
 
 
-export const UpdateEmail = (setIsLoadingEmail, email, setIsEditingEmail) => {
+export const GetUsers = () => {
 
-    const { token } = useContext(AuthContext)
+  const { isAuthenticated, setIsLoading, setusersData, setIsError } = useContext(AuthContext)
+  const url = import.meta.env.VITE_API_URL
 
-    const setProfileEmail = async () => {
-
-        if(!email){
-          return toast.error("You didn't enter any email")
-        }
-    
-        setIsLoadingEmail(true)
-        try {
-          const response = await fetch("http://localhost:8000/api/set_profile/", {
-            method: 'POST',
-            headers: {
-              "Content-Type":"application/json",
-              "Authorization":`Token ${token}`
-            },
-            body: JSON.stringify({'email':email})
-          })
+  useEffect(() => {
       
-          if(response.ok){
-            const data = await response.json()
-            toast.success(data.message)
-            setIsLoadingEmail(false)
-            setIsEditingEmail(false)
-          }else{
-            const errorData = await response.json()
-            toast.error(errorData.message)
-          }
-        } catch (error) {
-            return error
-        }
-        finally{
-            setIsLoadingEmail(false)
-        }
-    
+    const getAllUsers = async () => {
+      setIsLoading(true)
+
+      try {
+          const response = await axios.get(`${url}/users/`, {withCredentials:true})
+          setusersData(response.data.data.users)
+          setIsLoading(false)
+
+      } catch (error) {
+          console.log("error", error)
+          setIsError("Error Retrieving users")
+      }finally{
+          setIsLoading(false)
       }
-  return {setProfileEmail}
+    }
+
+    if(isAuthenticated){
+        getAllUsers()
+    }
+    
+}, [isAuthenticated, url, setIsError, setIsLoading, setusersData])
+
+  return
 }
-
-

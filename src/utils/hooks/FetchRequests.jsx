@@ -7,7 +7,7 @@ export const FetchRequests = () => {
     const { isAuthenticated, setIsLoadingFriends, setErrorFriend } = useContext(AuthContext)
 
     const url = import.meta.env.VITE_API_URL
-    const BASE_URL = `${url}api/friends/`
+    const BASE_URL = `${url}/friends/`
 
     const [friends, setFriends] = useState([])
 
@@ -52,7 +52,7 @@ export const FetchRecievedRequest = () => {
     const { isAuthenticated, setReceivedLoading, setNotificationCount } = useContext(AuthContext)
     
     const url = import.meta.env.VITE_API_URL
-    const BASE_URL = `${url}api/recieved_request/`
+    const BASE_URL = `${url}/recieved_request/`
 
     useEffect(() => {
 

@@ -5,14 +5,14 @@ import { AuthContext } from "../contexts/AuthContextProvider"
     const BASE_URL = import.meta.env.VITE_API_URL
 
 
-export const U = (username) => {
+export const UserChatMessages = (username) => {
 
-    const [loading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [data, setdata] = useState([])
     const { isAuthenticated } = useContext(AuthContext)
 
 
-    const url = `${BASE_URL}api/chat_messages/${username}`
+    const url = `${BASE_URL}/chat_messages/${username}/`
     useEffect(() => {
 
         const getUserChatMessage = async () => {
@@ -42,5 +42,5 @@ export const U = (username) => {
 
     }, [isAuthenticated, url])
 
-    return{data, loading}
+    return{data, isLoading}
 }

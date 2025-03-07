@@ -10,7 +10,7 @@ export const GetUserProfile = () => {
     const { isAuthenticated } = useContext(AuthContext)
 
     const BASE_URL = import.meta.env.VITE_API_URL
-    const url = `${BASE_URL}api/get_profile/`
+    const url = `${BASE_URL}/get_profile/`
     useEffect(() => {
         
         const getProfile = async () => {

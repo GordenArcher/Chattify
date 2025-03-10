@@ -1,25 +1,30 @@
 
 import '../../assets/CSS/chatbox.css'
-import PropTypes from 'prop-types'
+import PropTypes, { element } from 'prop-types'
 import UserCard from '../../components/userCard'
-import FriendLoad from '../../components/FriendLoad'
-import { useContext, useState } from 'react'
-import { AuthContext } from '../../utils/contexts/AuthContextProvider'
+import SkeletonLoading from '../../components/FriendLoad'
+import GetMessages from '../../api/GetMessages'
+import { useState } from 'react'
 
-export const Leftbox = ({ setCurrentChatView, 
+export const Leftbox = ({ setCurrentChatView,
     setCurrentView, 
     typingIndicator,
-    userStatus
+    // userStatus
  }) => {
-
-    const {friends, isLoadingFriends, errorFriend} = useContext(AuthContext)
+    
     const [searchFriends, setSearchFriends] = useState("")
 
+
+    const { data, isLoading, error} = GetMessages()
+
+  
     const refresh = () => {
         location.reload()
     }
 
-  return (  
+    if(error) return <div>{error}</div>
+
+  return (
 
     <div className="leftChatbox">
         <div className="leftchatboxwrap">
@@ -52,7 +57,7 @@ export const Leftbox = ({ setCurrentChatView,
 
             <div className="listfriends">
                 <div className="lists">
-                    {errorFriend ? 
+                    {error ? 
                         (
                             <div className='errorFri'>
                                 <span>Something went wrong</span>
@@ -67,13 +72,18 @@ export const Leftbox = ({ setCurrentChatView,
                             </div>
                         ) 
                         : (
-                        (isLoadingFriends ? (
-                            <FriendLoad />
+                        (isLoading ? (
+                            <div className='loading...'>
+                                <SkeletonLoading />
+                                <SkeletonLoading />
+                                <SkeletonLoading />
+                            </div>
                         ) : (
                         <div className="listswrap">
-                            {friends?.length > 0 ? (
-                                friends.map(friend => {
-                                    const username = friend.from_user.username.toLowerCase()
+                            {data.length > 0 ? (
+                                data.map(friend => {
+                                    console.log(friend)
+                                    const username = friend.friend.username.toLowerCase()
                                     const search = searchFriends.toLowerCase();
 
                                     const isMatch = !search || username.includes(search); 
@@ -81,9 +91,9 @@ export const Leftbox = ({ setCurrentChatView,
                                     return (
                                         <UserCard
                                             searchFriends={searchFriends}
-                                            friend={friend}
                                             setCurrentChatView={setCurrentChatView}
-                                            key={friend.id}
+                                            key={friend.friend.id}
+                                            friend={friend}
                                             highlight={isMatch}
                                             typingIndicator={typingIndicator}
                                         />

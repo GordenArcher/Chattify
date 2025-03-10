@@ -13,8 +13,6 @@ export const AuthContextProvider = ({children}) => {
     const [notificationCount, setNotificationCount] = useState(0)
     const [isLoadingFriends, setIsLoadingFriends] = useState(false)
     const [errorFriend, setErrorFriend] = useState(false)
-    const [friends, setFriends] = useState([])
-    const [messages, setMessages] = useState([])
 
     const url = import.meta.env.VITE_API_URL
     
@@ -32,6 +30,7 @@ export const AuthContextProvider = ({children}) => {
             if (response.ok) {
               const data = await response.json();
               console.log('Access token refreshed:', data);
+              setIsAuthenticated(true)
               return true;
             } else {
               console.error('Failed to refresh token');
@@ -97,14 +96,10 @@ export const AuthContextProvider = ({children}) => {
         setIsError,
         notificationCount,
         setNotificationCount,
-        setFriends,
-        friends,
         setErrorFriend,
         errorFriend,
         setIsLoadingFriends,
         isLoadingFriends,
-        messages,
-        setMessages,
         }}>
         {children}
     </AuthContext.Provider>

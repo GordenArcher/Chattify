@@ -15,15 +15,14 @@ import { GetUsers } from './api/UpdateData';
 
 function App() {
   
-  const { isAuthenticated, setReceived, setFriends } = useContext(AuthContext)
+  const { isAuthenticated, setReceived } = useContext(AuthContext)
   const { received } = FetchRecievedRequest()
   const { users } = FetchRequests()
 
   useEffect(() => {
     setReceived(received)
-    setFriends(users)
     
-  }, [setReceived, received, setFriends, users])
+  }, [setReceived, received, users])
 
 GetUsers()
 

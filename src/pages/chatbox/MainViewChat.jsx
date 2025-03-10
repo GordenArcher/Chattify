@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState, useContext, useMemo } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import '../../assets/css/mainview.css';
 import '../../assets/CSS/ch.css'
 import EmojiPicker from 'emoji-picker-react';
 import PropTypes from 'prop-types';
 import FriendInfo from '../../components/FriendInfo';
-import { UserChatMessages } from '../../utils/hooks/FetchUsers';
-import { AuthContext } from '../../utils/contexts/AuthContextProvider';
+// import { UserChatMessages } from '../../utils/hooks/FetchUsers';
 import { Load } from '../../components/Load';
 import Lottie from "lottie-react";
 import wavingAnimation from '../../assets/images/json/Animation - 1738248290524.json'
+import { MessagesContext } from '../../utils/contexts/MessagesProvider';
+import { countries } from '../../api/data';
 
 export const MainViewChat = ({ 
   currentChatView, 
@@ -27,25 +28,28 @@ export const MainViewChat = ({
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
   const [showOptions, setShowOptions] = useState(false)
-  const {data, isLoading} = UserChatMessages(currentChatView)
+  // const {data, isLoading} = UserChatMessages(currentChatView)
   const [friendProfile, setFriendProfile] = useState({})
   const [searchChat, setSearchChat] = useState(false)
   const [searchChatInput, setSearchChatInput] = useState("")
   const messagesEndRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null)
-  const { setMessages, messages } = useContext(AuthContext)
   const messageRefs = useRef({});
+  const { setLastMessage, messages, loadingMessages } = useContext(MessagesContext)
 
-  const sortedMessages = useMemo(() => {
-    if (data?.messages) {
-      return [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
-    }
-  }, [data?.messages]);
+  // const sortedMessages = useMemo(() => {
+  //   if (data?.messages) {
+  //     return [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
+  //   }
+  // }, [data?.messages]);
   
+  console.log(messages)
+
   useEffect(() => {
-    setFriendProfile(data?.friend);
-    setMessages(sortedMessages || []);
-  }, [setMessages, data.friend, sortedMessages]);
+    setFriendProfile(messages.friend);
+    setLastMessage(messages.messages || [])
+    
+  }, [messages, setLastMessage]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -123,7 +127,7 @@ export const MainViewChat = ({
     setSearchChatInput(search);
   
     if (search.trim() === '') {
-      setMessages(messages);
+      setMessage(messages);
       return;
     }
   
@@ -136,7 +140,7 @@ export const MainViewChat = ({
     });
   
     if (JSON.stringify(filtered) !== JSON.stringify(messages)) {
-      setMessages(filtered);
+      setMessage(filtered);
   
       const firstMatchedMessage = filtered.find(msg => msg.highlight);
       if (firstMatchedMessage) {
@@ -153,9 +157,7 @@ export const MainViewChat = ({
         {messages !== 0 &&
         <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
           <button onClick={scrollToBottom}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-chevron-down" viewBox="0 0 16 16">
-              <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-            </svg>
+            <ion-icon name="chevron-down-outline"></ion-icon>
           </button>
         </div>
         }
@@ -302,7 +304,7 @@ export const MainViewChat = ({
             <div className="chatview">
               <div className="incoming">
                 <div className="cm">
-                  {isLoading ? (
+                  {loadingMessages ? (
                     <Load />
                   ) :
                     (messages.length > 0 ? (
@@ -337,7 +339,7 @@ export const MainViewChat = ({
                                 </div>
                               </div>
                             ) : (
-                              <div ref={(el) => messageRefs.current[msg.id] = el} className='reciever msg'>
+                              <div ref={(el) => messageRefs.current[msg.id] = el} className='receiver msg'>
                                 <div className="box">
                                   <div className="msg_wrap">
                                     <div className={`msg_div ${msg.highlight ? "highlighted" : ""}`}>
@@ -454,7 +456,7 @@ export const MainViewChat = ({
             setPreviewImage={setPreviewImage} 
             f={friendProfile} 
             setShowFriendInfo={setShowFriendInfo} 
-            loading={isLoading} 
+            loading={loadingMessages} 
         />
 )}
 

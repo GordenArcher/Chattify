@@ -12,36 +12,36 @@ import AppIcon from '../../assets/images/G-KANAD.jpg';
 import { AuthContext } from "../../utils/contexts/AuthContextProvider"
 import { toast } from "react-toastify"
 import { GetUserProfile } from "../../utils/hooks/GetProfile"
-import { useNavigate } from "react-router-dom"
 import { Load } from "../../components/Load"
 import Tabs from "../../components/Tabs"
-
+import LogOut from "../../api/LogOut"
+import { MessagesContext } from "../../utils/contexts/MessagesProvider"
 
 export const Chatbox = () => {
   const [showLogOut, setShowLogOut] = useState(false)
-    const [currentView, setCurrentView] = useState("chat");
-    const [currentChatView, setCurrentChatView] = useState("");
-    const [typingIndicator, setTypingIndicator] = useState({})
-    const [mediaPreview, setMediaPreview] = useState(null)
-    const [mediaMessage, setMediaMessage] = useState("")
-    const [message, setMessage] = useState("")
-    const websocketRef = useRef(null);
-    const [u, setU] = useState()
-    const [isMobileView, setIsMobileView] = useState(false);
-    const [userStatus, setUserStatus] = useState({
-      user: "",
-      Ostatus:""
-    });
+  const [currentView, setCurrentView] = useState("chat");
+  const [currentChatView, setCurrentChatView] = useState("");
+  const [typingIndicator, setTypingIndicator] = useState({})
+  const [mediaPreview, setMediaPreview] = useState(null)
+  const [mediaMessage, setMediaMessage] = useState("")
+  const [message, setMessage] = useState("")
+  const websocketRef = useRef(null);
+  const [u, setU] = useState()
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [userStatus, setUserStatus] = useState({
+    user: "",
+    Ostatus:""
+  });
 
-    const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+  const { logoutUser, isLoggingOut } = LogOut()
 
-    const { usersDataDet } = GetUserProfile()
+  const { usersDataDet } = GetUserProfile()
+  const { setLastMessage } = useContext(MessagesContext)
 
     useEffect(() => {
-        if(usersDataDet){
-            setU(usersDataDet)
-        }
+      if(usersDataDet){
+          setU(usersDataDet)
+      }
     }, [usersDataDet])
 
 
@@ -96,7 +96,6 @@ export const Chatbox = () => {
               websocketRef.current.typingTimeouts = {};
             }
     
-           
             websocketRef.current.typingTimeouts[data.loggedInUser] = setTimeout(() => {
               setTypingIndicator(prev => {
                 const updated = { ...prev };
@@ -123,28 +122,16 @@ export const Chatbox = () => {
     
             showNotification(data.user, data.message);
             toast(data.user);
+            console.log(setLastMessage(data))
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
         }
       },
-      [setMessages, showNotification]
+      [setMessages, showNotification, setLastMessage]
     );
-
-    function getCookie(name) {
-      const cookies = document.cookie.split('; ');
-      for (let cookie of cookies) {
-          const [key, value] = cookie.split('=');
-          if (key === name) return value;
-      }
-      return null;
-  }
   
     useEffect(() => {
-      const token = getCookie("access_token");
-      console.log(token)
-      console.log(document.cookie);
-      // const inbox = "http://localhost:5173"
 
       const ws = new WebSocket(
         `ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}`, null, {credentials: 'same-origin'});
@@ -238,38 +225,6 @@ export const Chatbox = () => {
         }
       }
 
-      const logoutUser = async () => {
-        setIsLoading(true)
-    
-        try {
-          const response = await fetch("http://localhost:8000/api/auth/logout/", {method:"POST", headers: {
-            "Content-Type": "application/json",
-          }, credentials:"include"}
-        )
-      
-          if(response.ok){
-            const data = await response.json()
-            localStorage.removeItem("token")
-            setShowLogOut(false)
-            toast.success(data.message)
-            
-            setTimeout(() => {
-              navigate('/auth/login')
-            },3000)
-            
-            
-          }else{
-            const errordata = await response.json()
-            console.log(errordata)
-          }
-        } catch (error) {
-          console.log(error)
-        }finally{
-          setIsLoading(false)
-        }
-    
-        
-      }
 
       useEffect(() => {
         const checkMobileView = () => {
@@ -299,6 +254,7 @@ export const Chatbox = () => {
         pointerEvents: currentChatView !== "" ? "auto" : "none", 
         transition: "opacity 0.3s ease",
       }
+    
 
   return (
     <div className="chatbox">
@@ -323,7 +279,7 @@ export const Chatbox = () => {
                         {currentView === "notification" && <Notification />}
                     </div>
                 </div>
-
+                
                 <div className="viewchat" style={ isMobileView ? two : {} }>
                     {
                         currentChatView === "" ?
@@ -371,7 +327,7 @@ export const Chatbox = () => {
                   </div>
 
                   <div className="yex logO">
-                    <button onClick={logoutUser}>{isLoading ? <Load /> : 'Yes! Logout'}</button>
+                    <button onClick={logoutUser}>{isLoggingOut ? <Load /> : 'Yes! Logout'}</button>
                     
                   </div>
                 </div>

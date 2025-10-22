@@ -5,7 +5,7 @@ import { AuthContext } from "../utils/contexts/AuthContextProvider"
 const LogOut = () => {
 
     const BASE_URL = import.meta.env.VITE_API_URL
-    const { setIsAuthenticated } = useContext(AuthContext)
+    const { setIsAuthenticated, clearToken } = useContext(AuthContext)
     const [isLoggingOut, setIsLoggingOut] = useState(false)
 
     const logoutUser = async () => {
@@ -20,6 +20,7 @@ const LogOut = () => {
           if(response.ok){
             const data = await response.json()
             setIsAuthenticated(data.auth)
+            clearToken()
             toast.success(data.message)
             
           }else{

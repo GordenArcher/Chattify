@@ -7,12 +7,22 @@ export const MessagesContext = createContext()
 
 const MessagesProvider = ({ children }) => {
 
-    const [lastMessage, setLastMessage] = useState([])
+    const [unreadMessages, setUnreadMessages] = useState("")
     const [messages, setMessages] = useState([])
     const [loadingMessages, setLoadingMessages] = useState(false)
+    const [friendProfile, setFriendProfile] = useState({})
 
   return (
-    <MessagesContext.Provider value={{lastMessage, setLastMessage, messages, setMessages, loadingMessages, setLoadingMessages}}>
+    <MessagesContext.Provider value={{
+    unreadMessages, 
+    setUnreadMessages, 
+    messages, 
+    setMessages, 
+    loadingMessages, 
+    setLoadingMessages,
+    friendProfile,
+    setFriendProfile
+    }}>
         {children}
     </MessagesContext.Provider>
   )

@@ -6,23 +6,21 @@ const GetMessages = () => {
 
     const BASE_URL = import.meta.env.VITE_API_URL
 
-        const getAllMessages = async () => {
+    const getAllMessages = async () => {
 
-            try {
-                const response = await axios.get(`${BASE_URL}/get_messages`, {withCredentials:true})
+        try {
+            const response = await axios.get(`${BASE_URL}/get_messages`, {withCredentials:true})
 
-                if(response.data){
-                    return response.data.chats
-                }
-
-                
-            } catch (error) {
-                console.log(error)
+            if(response.data){
+                return response.data.chats
             }
-
+            
+        } catch (error) {
+            console.log(error)
         }
+    }
 
-        const { isLoading, error, data } = useQuery({queryKey: [""], queryFn: getAllMessages})
+    const { isLoading, error, data } = useQuery({queryKey: ["chats"], queryFn: getAllMessages})
 
     
   return { data, isLoading, error}

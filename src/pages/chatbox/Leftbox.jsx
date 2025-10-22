@@ -1,6 +1,6 @@
 
 import '../../assets/CSS/chatbox.css'
-import PropTypes, { element } from 'prop-types'
+import PropTypes from 'prop-types'
 import UserCard from '../../components/userCard'
 import SkeletonLoading from '../../components/FriendLoad'
 import GetMessages from '../../api/GetMessages'
@@ -9,6 +9,7 @@ import { useState } from 'react'
 export const Leftbox = ({ setCurrentChatView,
     setCurrentView, 
     typingIndicator,
+    friendsStatus
     // userStatus
  }) => {
     
@@ -21,8 +22,6 @@ export const Leftbox = ({ setCurrentChatView,
     const refresh = () => {
         location.reload()
     }
-
-    if(error) return <div>{error}</div>
 
   return (
 
@@ -81,28 +80,27 @@ export const Leftbox = ({ setCurrentChatView,
                         ) : (
                         <div className="listswrap">
                             {data.length > 0 ? (
-                                data.map(friend => {
-                                    console.log(friend)
-                                    const username = friend.friend.username.toLowerCase()
+                                data.map(friends => {
+                                    const username = friends.friend.username.toLowerCase()
                                     const search = searchFriends.toLowerCase();
 
-                                    const isMatch = !search || username.includes(search); 
+                                    const isMatch = !search || username.includes(search);
                                 
                                     return (
                                         <UserCard
                                             searchFriends={searchFriends}
                                             setCurrentChatView={setCurrentChatView}
-                                            key={friend.friend.id}
-                                            friend={friend}
+                                            key={friends.friend.id}
+                                            friends={friends}
                                             highlight={isMatch}
                                             typingIndicator={typingIndicator}
+                                            friendsStatus={friendsStatus}
+                                            onlineStatus={friendsStatus[friends.friend.username] || "Offline"} // NEW: Pass specific user status
                                         />
                                     );
                                 
                                 }
                                 )
-                                
-                            // <div>HI</div>
                             ) : (
                                 <div className='n_fie'>
                                     <div className="no_friends">
@@ -137,4 +135,5 @@ Leftbox.propTypes = {
     setCurrentView: PropTypes.func.isRequired,
     typingIndicator: PropTypes.object,
     userStatus: PropTypes.object,
+    friendsStatus: PropTypes.object,
 }

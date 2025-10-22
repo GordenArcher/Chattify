@@ -4,8 +4,7 @@ import PropTypes from "prop-types"
 
 const Notifications = () => {
 
-    const { received, isLoading, setReceived} = FetchRecievedRequest()
-
+    const { received, isLoading, setReceived } = FetchRecievedRequest()
 
   return (
     <div className="notification">

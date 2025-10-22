@@ -1,13 +1,11 @@
-import axios from 'axios'
+
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../contexts/AuthContextProvider'
+import api from '../axios'
 
 export const FetchRequests = () => {
 
     const { isAuthenticated, setIsLoadingFriends, setErrorFriend } = useContext(AuthContext)
-
-    const url = import.meta.env.VITE_API_URL
-    const BASE_URL = `${url}/friends/`
 
     const [friends, setFriends] = useState([])
 
@@ -18,7 +16,7 @@ export const FetchRequests = () => {
             setIsLoadingFriends(true)
     
             try {
-                const response = await axios.get(BASE_URL, {withCredentials:true})
+                const response = await api.get("friends")
 
                 if(response){
                     setErrorFriend(false)
@@ -40,9 +38,9 @@ export const FetchRequests = () => {
 
         
 
-    }, [isAuthenticated, BASE_URL, setErrorFriend, setIsLoadingFriends, setFriends])
+    }, [isAuthenticated, setErrorFriend, setIsLoadingFriends, setFriends])
 
-    return {users: friends}
+    return { users: friends }
 }
 
 
@@ -50,9 +48,6 @@ export const FetchRecievedRequest = () => {
 
     const [received, setReceived] = useState([])
     const { isAuthenticated, setReceivedLoading, setNotificationCount } = useContext(AuthContext)
-    
-    const url = import.meta.env.VITE_API_URL
-    const BASE_URL = `${url}/recieved_request/`
 
     useEffect(() => {
 
@@ -60,7 +55,7 @@ export const FetchRecievedRequest = () => {
 
             setReceivedLoading(true)
             try {
-                const response = await axios.get(BASE_URL, {withCredentials:true})
+                const response = await api.get("/recieved_request/")
 
                 if(response){
                     setReceived(response.data.data)
@@ -80,7 +75,7 @@ export const FetchRecievedRequest = () => {
         }
         
 
-    }, [isAuthenticated, BASE_URL, setReceivedLoading, setNotificationCount])
+    }, [isAuthenticated, setReceivedLoading, setNotificationCount])
 
     
   return { received, setReceived }

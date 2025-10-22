@@ -1,49 +1,30 @@
 import PropTypes from "prop-types"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { Load } from "./Load"
-import { AuthContext } from "../utils/contexts/AuthContextProvider"
 import { toast } from "react-toastify"
+import api from "../utils/axios"
 
 
 export const SearchFriend = ({user, highlight}) => {
 
-    const { token } = useContext(AuthContext)
     const [isLoading, setIsLoading] = useState(false)
-
-    const BASE_URL = `http://localhost:8000/api/send_request/${user.id}/`
 
     const SendRequest = async () => {
         try {
             setIsLoading(true)
             
-            const response = await fetch(BASE_URL, {
-                method: 'POST',
-                headers:{
-                    "Content-Type":"application/json",
-                    "Authorization":`Token ${token}`
-                }
-            })
+            const response = await api.post(`/send_request/${user.username}/`)
 
 
-            if(response.ok){
-                const data = await response.json()
-                if(data.status === 'success'){
-                    toast.success(data.message)
-                    
-                }
-
-            }
-            else{
-
-                const errorData = await response.json()
-                if(errorData){
-                    toast.error(errorData.message)
-                }
-                
+            if(response){
+                const data = await response.data
+                toast.success(data.message)
             }
 
         } catch (error) {
-            console.log(error)
+            const errorData = await error.response.data
+            toast.error(errorData.message || "Error sending request")
+                
         }finally{
             setIsLoading(false)
         }

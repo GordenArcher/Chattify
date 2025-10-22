@@ -6,7 +6,6 @@ import { toast } from "react-toastify"
 const FriendInfo = ({f, isLoading, setShowFriendInfo, messages, previewImage, setPreviewImage}) => {
 
     const [activeTab, setActiveTab] = useState("media")
-    
 
   return (
     <motion.div
@@ -121,7 +120,7 @@ const FriendInfo = ({f, isLoading, setShowFriendInfo, messages, previewImage, se
 }
 
 FriendInfo.propTypes = {
-    isLoading: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool,
     setShowFriendInfo: PropTypes.func.isRequired,
     f: PropTypes.shape({
         username: PropTypes.string.isRequired,

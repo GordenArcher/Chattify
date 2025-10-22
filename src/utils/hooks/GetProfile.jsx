@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "../contexts/AuthContextProvider"
+import api from "../axios"
 
 export const GetUserProfile = () => {
 
@@ -9,29 +10,25 @@ export const GetUserProfile = () => {
     const [error, setIsError] = useState("")
     const { isAuthenticated } = useContext(AuthContext)
 
-    const BASE_URL = import.meta.env.VITE_API_URL
-    const url = `${BASE_URL}/get_profile/`
     useEffect(() => {
         
         const getProfile = async () => {
             setIsLoading(true)
 
             try {
-                const response = await fetch(url, {credentials:"include"})
-                if(response.ok){
-                    const data = await response.json()
+                const response = await api.get("/get_profile/")
+
+                if(response){
+                    const data = response.data
                     setusersData(data);
                     setusersDataDet(data.username)
                     setIsLoading(false)  
-                }else{
-                    const err = await response.json()
-                    console.log(err)
                 }
                 
-
             } catch (error) {
                 console.log("error", error)
-                setIsError("Error Retrieving users")
+                const err = error.response.data
+                setIsError(err || "Error Retrieving users")
             }finally{
                 setIsLoading(false)
             }
@@ -43,7 +40,7 @@ export const GetUserProfile = () => {
             getProfile()
         }
         
-    }, [isAuthenticated, url])
+    }, [isAuthenticated])
 
 
   return {user: usersData, loading, error, usersDataDet}

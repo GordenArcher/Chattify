@@ -8,7 +8,7 @@
 .user_profile_container, .user_cover_image, .user_profile_image, .users_details, .use_del,
 .bio_edit, .set_bio, .op, .user_bio_info, .rt, .edit_b, .no_cover, .user_username_wrap, .s_username_f,
 .s_email_f, .find-friends, .find_friends_in, .s_friends, .find_friends_wrap, .search_input,
-.searc, .user_container, .user_cont, .n_fie, .notification, .all_notification, .notify,
+.searc, .user_container, .user_cont, .n_fie, .all_notification, .notify,
 .recieved_req, .rec_rque_flex, .choose_palace, .image_di, .sel, .choose-cover, .image_cove,
 .update_profile, .choose_cover_image, .choose-cover, .cover_picture, .choose_c, .ed{
     width: 100%;
@@ -191,6 +191,7 @@
 
 .Timeset{
     font-size: .8rem;
+    font-weight: 800;
 }
 
 .messTime{
@@ -208,15 +209,16 @@
 }
 
 .numcount{
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: hsl(241, 97%, 24%);
-    color: hsl(0, 0%, 100%);
+    color: hsla(0, 0%, 100%, 0.801);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: .7rem;
+    font-weight: 800;
 }
 
 .user_profile, .profile_wrap, .user_images, .user_profile_image, .users_bio{

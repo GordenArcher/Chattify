@@ -4,7 +4,7 @@ import { GetUserProfile } from '../utils/hooks/GetProfile'
 import { useContext } from 'react'
 import { AuthContext } from '../utils/contexts/AuthContextProvider'
 
-export const LeftTab = ({ setCurrentView, setShowLogOut }) => {
+export const LeftTab = ({ setCurrentView, setShowLogOut, setCurrentChatView }) => {
 
     const {user, usersDataDet} = GetUserProfile()
     const {notificationCount} = useContext(AuthContext)
@@ -43,6 +43,17 @@ export const LeftTab = ({ setCurrentView, setShowLogOut }) => {
                                 {notificationCount}
                             </div>
                         }
+                        
+                    </div>
+                </div>
+
+                <div className="ai">
+                    <div className="ai-icon">
+                        <button onClick={() => setCurrentView("ai")}>
+                            <span >AI</span>
+                            {/* <i className='bi bi-bell'></i> */}
+                        </button>
+
                         
                     </div>
                 </div>

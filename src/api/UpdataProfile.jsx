@@ -1,13 +1,12 @@
-import axios from "axios"
+
 import { useState } from "react"
 import { toast } from "react-toastify"
 import { GetUserProfile } from "../utils/hooks/GetProfile"
+import api from "../utils/axios"
 
 const UpdataProfile = ({ profileData }) => {
 
     const [sendingProfile, setSendingProfile] = useState(false)
-
-    const BASE_URL = import.meta.env.VITE_API_URL
 
     const formData = new FormData()
     formData.append("username", profileData?.username)
@@ -21,8 +20,9 @@ const UpdataProfile = ({ profileData }) => {
         setSendingProfile(true)
 
         try {
-            const  response = await axios.post(`${BASE_URL}/set_profile/`, {formData}, { withCredentials: true })
-            if(response.data){
+            const  response = await api.post(`/set_profile/`, {formData})
+
+            if(response){
                 toast.success(response.data.message)
                 GetUserProfile()
                return response.data.data 

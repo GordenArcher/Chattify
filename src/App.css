@@ -9,9 +9,9 @@
 }
 
 *{
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .tab, .flow{
@@ -27,7 +27,7 @@ box-sizing: border-box;
   padding: 10px 0;
 }
 
-.settings, .profile, .chats, .notification, .cl_sea, .logout{
+.settings, .profile, .chats, .notification, .cl_sea, .logout, .ai{
   position: relative;
 }
 
@@ -36,7 +36,7 @@ box-sizing: border-box;
 }
 
 .settingsicon button, .chaticon button, .profileimage img, .addfriendicon button, 
-.no_profile_i, .notification-icon button, .cl_sea button, .logouticon button{
+.no_profile_i, .notification-icon button, .cl_sea button, .logouticon button, .ai button{
   width: 45px;
   height: 45px;
   border: none;
@@ -47,13 +47,22 @@ box-sizing: border-box;
   z-index: 1;
 }
 
+.ai button{
+  color: hsl(0, 0%, 100%);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
 .profileimage img{
   border: 1px solid hsl(0, 0%, 100%);
   object-fit: cover;
 }
 
 .settingsicon button:hover, .chaticon button:hover, .addfriendicon button:hover, 
-.notification-icon button:hover, .cl_sea button:hover, .logouticon button:hover{
+.notification-icon button:hover, .cl_sea button:hover, .logouticon button:hover, .ai button:hover{
   background: hsla(0, 0%, 85%, 0.32);
 }
 

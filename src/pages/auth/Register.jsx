@@ -58,7 +58,7 @@ export const Register = () => {
   const handleLogin = async (response) => {
       const { credential } = response;
       try {
-        const res = await fetch(`${BASE_URL}/api/auth/google-register/`, {
+        const res = await fetch(`${BASE_URL}/auth/google-register/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

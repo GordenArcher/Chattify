@@ -16,6 +16,7 @@ import { Load } from "../../components/Load"
 import Tabs from "../../components/Tabs"
 import LogOut from "../../api/LogOut"
 import { MessagesContext } from "../../utils/contexts/MessagesProvider"
+import AI from "./AI"
 
 export const Chatbox = () => {
   const [showLogOut, setShowLogOut] = useState(false)
@@ -23,10 +24,11 @@ export const Chatbox = () => {
   const [currentChatView, setCurrentChatView] = useState("");
   const [typingIndicator, setTypingIndicator] = useState({})
   const [mediaPreview, setMediaPreview] = useState(null)
-  const [mediaMessage, setMediaMessage] = useState("")
+  const [mediaMessage, setMediaMessage] = useState(null)
   const [message, setMessage] = useState("")
   const websocketRef = useRef(null);
   const [u, setU] = useState()
+  const [friendsStatus, setFriendsStatus] = useState({})
   const [isMobileView, setIsMobileView] = useState(false);
   const [userStatus, setUserStatus] = useState({
     user: "",
@@ -52,7 +54,7 @@ export const Chatbox = () => {
     }, []);
     
 
-    const CHAT_BASE_URL = "localhost:8000";
+    const CHAT_BASE_URL = import.meta.env.VITE_WEBSOCKET_URL
     const { setMessages } = useContext(AuthContext);
   
     const showNotification = useCallback((sender, message) => {
@@ -73,93 +75,118 @@ export const Chatbox = () => {
       }
     }, []);
 
-    const handleWebSocketMessage = useCallback(
-      (e) => {
-        try {
-          const data = JSON.parse(e.data);
-    
+  const handleWebSocketMessage = useCallback(
+    (e) => {
+      try {
+        const data = JSON.parse(e.data);
+
+        console.log("📨 Received WebSocket message:", data);
+
+        if (data.type === "typing") {
+          console.log("⌨️ Typing event:", data);
           
-          if (data.type === "typing" && data.loggedInUser) {
-            console.log("Typing event:", data);
-            
-            setTypingIndicator(prev => ({
-              ...prev,
-              [data.loggedInUser]: true, 
-            }));
-            
-            if (websocketRef.current.typingTimeouts?.[data.loggedInUser]) {
-              clearTimeout(websocketRef.current.typingTimeouts[data.loggedInUser]);
-            }
-    
-            
-            if (!websocketRef.current.typingTimeouts) {
-              websocketRef.current.typingTimeouts = {};
-            }
-    
-            websocketRef.current.typingTimeouts[data.loggedInUser] = setTimeout(() => {
-              setTypingIndicator(prev => {
-                const updated = { ...prev };
-                delete updated[data.loggedInUser];
-                return updated;
-              });
-            }, 2000);
+          setTypingIndicator(prev => ({
+            ...prev,
+            [data.loggedInUser]: true,
+          }));
+          
+          if (websocketRef.current.typingTimeouts?.[data.loggedInUser]) {
+            clearTimeout(websocketRef.current.typingTimeouts[data.loggedInUser]);
           }
-    
-          if (data.type === 'user_status') {
-            const { username, status } = data;
-            setUserStatus((prevDel) => ({...prevDel, user:username, Ostatus: status}))
-        }
 
-          if (data.type === "chat_message") {
-            console.log(data)
-            setMessages((prevMessages) => {
-              const isDuplicate = prevMessages.some(
-                (message) => message.message_id === data.message_id
-              );
-    
-              return isDuplicate ? prevMessages : [...prevMessages, data];
+          if (!websocketRef.current.typingTimeouts) {
+            websocketRef.current.typingTimeouts = {};
+          }
+
+          websocketRef.current.typingTimeouts[data.loggedInUser] = setTimeout(() => {
+            setTypingIndicator(prev => {
+              const updated = { ...prev };
+              delete updated[data.loggedInUser];
+              return updated;
             });
+          }, 2000);
+        }
+
+        if (data.type === 'user_status') {
+          const { username, status } = data;
+          console.log("👤 User status:", data);
+          setUserStatus((prevDel) => ({ ...prevDel, user: username, Ostatus: status }));
+        }
+
+        if (data.type === 'friends_status') {
+          console.log("👥 Friends status:", data.friends_statuses);
+          setFriendsStatus(data.friends_statuses);
+          // Update your friends list with online statuses
+        }
+
+        if (data.type === "chat_message") {
+          console.log("💬 Chat message:", data);
+          setMessages((prevMessages) => {
+            const isDuplicate = prevMessages.some(
+              (message) => message.message_id === data.message_id
+            );
+
+            return isDuplicate ? prevMessages : [...prevMessages, data];
+          });
+
+          showNotification(data.user, data.message);
+          // toast(`New message from ${data.user}`);
+          setLastMessage(data);
+        }
+
+        if (data.error) {
+          console.error("❌ Error from server:", data.error);
+          toast.error(data.error);
+        }
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+      }
+    },
+    [setMessages, showNotification, setLastMessage]
+  );
+  
+  useEffect(() => {
+
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     
-            showNotification(data.user, data.message);
-            toast(data.user);
-            console.log(setLastMessage(data))
-          }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      },
-      [setMessages, showNotification, setLastMessage]
-    );
-  
-    useEffect(() => {
+    const wsUrl = `${protocol}://${CHAT_BASE_URL}/ws/chat/`;
 
-      const ws = new WebSocket(
-        `ws://${CHAT_BASE_URL}/ws/chat/${currentChatView}`, null, {credentials: 'same-origin'});
-  
+    console.log("Connecting to:", wsUrl);
 
-      websocketRef.current = ws;
-  
-      ws.onopen = () => {
-        console.log("WebSocket connection opened");
-      };
-  
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-  
-      ws.onmessage = handleWebSocketMessage;
-  
-      ws.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-  
-      return () => {
-        if (ws) {
-          ws.close();
-        }
-      };
-    }, [currentChatView, handleWebSocketMessage, websocketRef, u]);
-  
+    const ws = new WebSocket(wsUrl);
+
+    websocketRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onmessage = handleWebSocketMessage;
+
+    ws.onclose = (event) => {
+      console.log("WebSocket connection closed");
+      console.log("Close code:", event.code);
+      console.log("Close reason:", event.reason);
+      
+      // Handle specific close codes
+      if (event.code === 4001) {
+        console.error("Authentication failed. Please log in again.");
+        // Redirect to login or show error
+      } else if (event.code === 4002) {
+        console.error("Invalid chat recipient.");
+      }
+    };
+
+    return () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+  }, [currentChatView, handleWebSocketMessage, CHAT_BASE_URL]);
 
     useEffect(() => {
       const intervalId = setInterval(() => {
@@ -186,7 +213,8 @@ export const Chatbox = () => {
             websocketRef.current.send(
               JSON.stringify({ 
                 type: "message",
-                "media": base64
+                "media": base64,
+                recipient: currentChatView,
                })
             );
             setMediaMessage(null)
@@ -200,9 +228,10 @@ export const Chatbox = () => {
   
           websocketRef.current.send(JSON.stringify({
             type: "message", 
-            message 
+            message ,
+            recipient: currentChatView,
           }))
-  
+          
           setMessage("")
         }
     }    
@@ -217,6 +246,7 @@ export const Chatbox = () => {
               JSON.stringify({
                 type: "typing",
                 typing: true,
+                recipient: currentChatView,
               })
             )
           }
@@ -224,7 +254,6 @@ export const Chatbox = () => {
           console.error("websocketRef is not open.");
         }
       }
-
 
       useEffect(() => {
         const checkMobileView = () => {
@@ -261,22 +290,24 @@ export const Chatbox = () => {
         <div className="boxcontainer">
             <div className="chatwrapper">
                 <div className="tabi">
-                    <LeftTab setCurrentView={setCurrentView} setShowLogOut={setShowLogOut}/>
+                    <LeftTab setCurrentView={setCurrentView} setShowLogOut={setShowLogOut} setCurrentChatView={setCurrentChatView} />
                 </div>
 
                 <div className="leftbox"style={ isMobileView ? one : {}} >
                     <div className="content">
                         {currentView === "chat" && 
                         <Leftbox 
-                        userStatus={userStatus}
-                        typingIndicator={typingIndicator} 
-                        setCurrentView={setCurrentView} 
-                        setCurrentChatView={setCurrentChatView} 
+                          userStatus={userStatus}
+                          typingIndicator={typingIndicator} 
+                          setCurrentView={setCurrentView} 
+                          setCurrentChatView={setCurrentChatView} 
+                          friendsStatus={friendsStatus}
                         />}
                         {/* {currentView === "settings" && <Settings />} */}
                         {currentView === "find_friends" && <FindFrinds />} 
                         {currentView === "profile" && <Profile />}
                         {currentView === "notification" && <Notification />}
+                        {currentView === "ai" && <AI />}
                     </div>
                 </div>
                 
@@ -287,13 +318,13 @@ export const Chatbox = () => {
                         :
                         (
                             <MainViewChat 
-                                setCurrentChatView={setCurrentChatView} 
                                 currentChatView={currentChatView}
+                                setCurrentChatView={setCurrentChatView}
                                 typingIndicator={typingIndicator}
-                                setTypingIndicator={setTypingIndicator}
                                 websocketRef={websocketRef}
                                 sendMessages={sendMessages}
                                 mediaPreview={mediaPreview}
+                                setMediaMessage={setMediaMessage}
                                 setMediaPreview={setMediaPreview}
                                 messageChange={messageChange}
                                 message={message}
@@ -304,6 +335,8 @@ export const Chatbox = () => {
                         )
                       
                     }
+
+                    {currentChatView === "ai" && <div>AI</div>}
                     
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { AuthContext } from '../../utils/contexts/AuthContextProvider';
 import styled from 'styled-components';
 import Switch from '../../components/Toggle';
 import { GoogleLogin } from '@react-oauth/google';
+import api from '../../utils/axios';
 
 export const Login = () => {
 
@@ -24,52 +25,29 @@ export const Login = () => {
 
     const BASE_URL = import.meta.env.VITE_API_URL
 
-    const loginUser = async (e) => {
-
-        e.preventDefault()
-
-        const loginApiUrl = `${BASE_URL}/auth/login/`
+    const loginUser = async () => {
 
         if(!LoginData.username || !LoginData.password) return toast.error("Input Fields are enpty");
-        
-        try {
-            setLoader(true)
-            const response = await fetch(loginApiUrl, {
-                method:"POST",
-                headers: {
-                    "Content-Type":"application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    username : LoginData.username,
-                    password : LoginData.password,
-                })
-            })
 
-            if(response.ok){
-                const data = await response.json()
-                setLoader(false)
+        setLoader(true)
+
+        try {
+            
+            const response = await api.post("/auth/login/", { username : LoginData.username, password : LoginData.password })
+
+            if(response){
+                const data = response.json()
                 setIsAuthenticated(data.auth)
                 toast.success(data.sucess);
                 setTimeout(() => {
-                    navigate('/chat')
+                  navigate('/chat')
                 }, 2000)
                 
             }
-            else{
-                const errorData = await response.json()
-                if (errorData) {
-                    console.log(errorData)
-                    toast.error(errorData.message)
-                    setLoader(false)
-                } else {
-                    setLoader(false)
-                    console.error('Error:', errorData);
-                }
-            }
 
         } catch (error) {
-            console.log(error)
+          const errorData = error.response.data
+          toast.error(errorData.message || "Error logging in")
         }finally{
             setLoader(false)
         }
@@ -81,7 +59,7 @@ export const Login = () => {
     const handleLogin = async (response) => {
         const { credential } = response;
         try {
-          const res = await fetch(`${BASE_URL}/api/auth/google-login/`, {
+          const res = await fetch(`${BASE_URL}/auth/google-login/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -106,15 +84,13 @@ export const Login = () => {
           console.error('Error during authentication', error);
         }
       };
-      
-
 
   return (
     <div className='login_wrapper'>
         <div className='log__'>
             <StyledWrapper >
                 <div className="log__container">
-                    <form className="form">
+                    <div className="form">
                         <div className="flex-column">
                             <label>Username </label></div>
                             <div className="inputForm">
@@ -133,16 +109,19 @@ export const Login = () => {
                               </div>
                               <span className="span"><Link to={'/reset-password'}>Forgot password?</Link></span>
                             </div>
+
                             <button className="button-submit" onClick={loginUser}>{ loader? <Loader /> : "Sign In"}</button>
+
                             <p className="p">Don&apos;t have an account? <span className="span"><Link to={'/auth/register'}>Sign Up</Link> </span>
+
                             </p><p className="p line">Or With</p>
                             <div className="flex-row">
                               <GoogleLogin client_id={client_id} onSuccess={handleLogin} onError={(error) => console.log(error)}
                                   render={(renderProps) => (
                                       <button 
                                       className="btn google"
-                                      onClick={renderProps.onClick}
-                                      disabled={renderProps.disabled}
+                                        onClick={renderProps.onClick}
+                                        disabled={renderProps.disabled}
                                       >
                                           <svg version="1.1" width={20} id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style={{enableBackground: 'new 0 0 512 512'}} xmlSpace="preserve">
                                               <path style={{fill: '#FBBB00'}} d="M113.47,309.408L95.648,375.94l-65.139,1.378C11.042,341.211,0,299.9,0,256 c0-42.451,10.324-82.483,28.624-117.732h0.014l57.992,10.632l25.404,57.644c-5.317,15.501-8.215,32.141-8.215,49.456 C103.821,274.792,107.225,292.797,113.47,309.408z" />
@@ -163,7 +142,7 @@ export const Login = () => {
                                     Apple 
                                 </button> */}
                             </div>
-                    </form>
+                    </div>
                 </div>
             </StyledWrapper>
         </div>

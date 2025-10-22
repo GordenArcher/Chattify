@@ -9,9 +9,9 @@ import { Load } from '../../components/Load';
 import Lottie from "lottie-react";
 import wavingAnimation from '../../assets/images/json/Animation - 1738248290524.json'
 import { MessagesContext } from '../../utils/contexts/MessagesProvider';
-import { countries } from '../../api/data';
+import { toast } from 'react-toastify';
 
-export const MainViewChat = ({ 
+export const MainViewChat = ({
   currentChatView, 
   setCurrentChatView, 
   typingIndicator, 
@@ -28,28 +28,13 @@ export const MainViewChat = ({
   const [showPicker, setShowPicker] = useState(false);
   const [showFriendInfo, setShowFriendInfo] = useState(false);
   const [showOptions, setShowOptions] = useState(false)
-  // const {data, isLoading} = UserChatMessages(currentChatView)
-  const [friendProfile, setFriendProfile] = useState({})
   const [searchChat, setSearchChat] = useState(false)
   const [searchChatInput, setSearchChatInput] = useState("")
   const messagesEndRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null)
   const messageRefs = useRef({});
-  const { setLastMessage, messages, loadingMessages } = useContext(MessagesContext)
-
-  // const sortedMessages = useMemo(() => {
-  //   if (data?.messages) {
-  //     return [...data.messages].sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
-  //   }
-  // }, [data?.messages]);
-  
-  console.log(messages)
-
-  useEffect(() => {
-    setFriendProfile(messages.friend);
-    setLastMessage(messages.messages || [])
-    
-  }, [messages, setLastMessage]);
+  const { messages, setMessages, loadingMessages, friendProfile } = useContext(MessagesContext)
+  const BASE_URL = import.meta.env.VITE_API_URL_STATIC
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,11 +43,10 @@ export const MainViewChat = ({
   const handleMediaChange = (e) => {
       const file = e.target.files[0]; 
       if (file) {
-        setMediaMessage(file);
-        
         const reader = new FileReader();
         reader.onloadend = () => {
-          setMediaPreview(reader.result);  
+          setMediaPreview(reader.result);
+          setMediaMessage(reader.result);  
         }
         reader.readAsDataURL(file); 
       }
@@ -77,7 +61,6 @@ export const MainViewChat = ({
   };
 
   useEffect(() => {
-
     const closeEmogi = () => {
       setShowPicker(false)
       setShowOptions(false)
@@ -126,21 +109,21 @@ export const MainViewChat = ({
     const search = e.target.value;
     setSearchChatInput(search);
   
-    if (search.trim() === '') {
-      setMessage(messages);
-      return;
-    }
-  
     const filtered = messages.map((msg) => {
       const isMatch = msg.message.toLowerCase().includes(search.toLowerCase());
-      return {
+      if(isMatch) {
+        return {
         ...msg,
         highlight: isMatch,
       };
+      }else{
+        return {...msg}
+      }
+      
     });
   
     if (JSON.stringify(filtered) !== JSON.stringify(messages)) {
-      setMessage(filtered);
+      setMessages(filtered);
   
       const firstMatchedMessage = filtered.find(msg => msg.highlight);
       if (firstMatchedMessage) {
@@ -148,6 +131,17 @@ export const MainViewChat = ({
       }
     }
   };
+
+  function isOnlyEmojis(str) {
+    const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)+$/u;
+    return emojiRegex.test(str.trim());
+  }
+
+  const delete_message = (message) => {
+    setMessages((chats) => chats.filter((cm) => cm.id !== message.id))
+    toast.success(`${message.message} is deleted`)
+  }
+  
 
   return (
     <>
@@ -157,7 +151,9 @@ export const MainViewChat = ({
         {messages !== 0 &&
         <div className="scrol_but" ref={scrollBtn} style={{ display: 'block' }}>
           <button onClick={scrollToBottom}>
-            <ion-icon name="chevron-down-outline"></ion-icon>
+            <span>
+              <ion-icon name="chevron-down-outline"></ion-icon>
+            </span>
           </button>
         </div>
         }
@@ -204,9 +200,9 @@ export const MainViewChat = ({
                       <div className="banner_image_profile">
                         
                         {friendProfile ? (
-                            (friendProfile.profile?.profile_picture ? (
+                            (friendProfile?.profile?.profile_picture ? (
                                 <div className='friendProfile fp'>
-                                  <img src={`http://localhost:8000${friendProfile.profile?.profile_picture}`} alt={`${friendProfile.username}'s profile`}/>
+                                  <img src={`${BASE_URL}${friendProfile.profile?.profile_picture}`} alt={`${friendProfile.username}'s profile`}/>
                                 </div>
                               ) : (
                                 
@@ -297,7 +293,6 @@ export const MainViewChat = ({
                 </div>
               </div>
               )}
-              
             </div>
           </div>
           <div className="mainchatview" ref={mainchatview}>
@@ -309,63 +304,77 @@ export const MainViewChat = ({
                   ) :
                     (messages.length > 0 ? (
                       (messages.map((msg) => {
+                        const isEmojiOnly = isOnlyEmojis(msg.message);
+
                           const time = new Date(msg.sent_at)
                           const timestamp = `${time.getHours()}:${time.getMinutes() < 10 ? '0' + time.getMinutes() : time.getMinutes()}`;
+
+                          if(msg.is_deleted) return
                           
                           return (
                             <div key={msg.id} className='inbox'>
-                            {currentChatView !== msg.user ? (
-                              <div ref={(el) => messageRefs.current[msg.id] = el} className='sender msg'>
-                                <div className="box">
-                                  <div className="msg_wrap">
-                                    <div className={`msg_div ${msg.highlight ? "highlighted" : ""}`}>
-                                      {msg.media ? (
-                                        (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-                                          <img draggable='false' src={`http://localhost:8000${msg.media}`} alt="" onClick={() => setPreviewImage(msg.media)} />
+                              {currentChatView !== msg.user ? (
+                                <div ref={(el) => messageRefs.current[msg.id] = el} style={{position:"relative", display: "flex", alignItems:"center", gap:8}} className='sender msg'>
+                                  <div className='opt_mg'>
+                                    <button>
+                                      <i className='bi bi-three-dots-vertical'></i>
+                                    </button>
+                                  </div>
+
+                                  <div style={{position:"relative"}} className="box" onDoubleClick={() => delete_message(msg)}>
+                                    <div className="msg_wrap">
+                                      <div className={`msg_div ${msg.highlight ? "highlighted" : ""}`}>
+                                        {msg.media ? (
+                                          (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                            <img draggable='false' src={`${BASE_URL}${msg.media}`} alt="" onClick={() => setPreviewImage(msg.media)} />
+                                          ) : (
+                                            <video src={`${BASE_URL}${msg.media}`} controls></video>
+                                          ))
                                         ) : (
-                                          <video src={`http://localhost:8000${msg.media}`} controls></video>
-                                        ))
-                                      ) : (
-                                        <span className="">{msg.message}</span> 
-                                      )}
+                                          <span className={`${isEmojiOnly ? "big-emojis" : ""}`}>{msg.message}</span> 
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                          
-                                  <div className="msg_t">
-                                    <div className="msg_tst">
-                                      <p>{timestamp}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div ref={(el) => messageRefs.current[msg.id] = el} className='receiver msg'>
-                                <div className="box">
-                                  <div className="msg_wrap">
-                                    <div className={`msg_div ${msg.highlight ? "highlighted" : ""}`}>
-                                      {msg.media ? (
-                                        (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-                                          <img draggable='false' src={`http://localhost:8000${msg.media}`} onClick={() => setPreviewImage(msg.media)} />
-                                        ) : (
-                                          <video src={`http://localhost:8000${msg.media}`} controls></video>
-                                        ))
-                                      ) : (
-                                        <span className="">{msg.message}</span> 
-                                      )}
-                                    </div>
-                                  </div>
-                          
-                                  <div className="msg_t">
-                                    <div className="msg_tst">
-                                      <p>{timestamp}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          
                             
+                                    <div className="msg_t">
+                                      <div className="msg_tst">
+                                        <p>{timestamp}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div ref={(el) => messageRefs.current[msg.id] = el} className='receiver msg' style={{position:"relative", display: "flex", alignItems:"center", gap:6}}>
+                                  <div style={{position:"relative"}} className="box" onDoubleClick={() => delete_message(msg)}>
+                                    <div style={{position:"relative"}} className="msg_wrap">
+                                      <div className={`msg_div ${msg.highlight ? "highlighted" : null}`}>
+                                        {msg.media ? (
+                                          (msg.media.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
+                                            <img draggable='false' src={`${BASE_URL}${msg.media}`} onClick={() => setPreviewImage(msg.media)} />
+                                          ) : (
+                                            <video src={`${BASE_URL}${msg.media}`} controls></video>
+                                          ))
+                                        ) : (
+                                          <span className={`${isEmojiOnly ? "big-emojis" : ""}`}>{msg.message}</span>
+                                        )}
+                                      </div>
+                                    </div>
+                            
+                                    <div className="msg_t">
+                                      <div className="msg_tst">
+                                        <p>{timestamp}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className='opt_mg'>
+                                      <button>
+                                        <i className='bi bi-three-dots-vertical'></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                              )}
+                          </div>
                           )
                           
                         })
@@ -391,11 +400,20 @@ export const MainViewChat = ({
 
           <div className="chatinput">
 
-              {mediaPreview && <div className="preview_media_image">
-                <div className="preview">
-                  <img src={mediaPreview} alt="message media" />
+              {mediaPreview && 
+                <div className="preview_media_image">
+                  <div className="preview">
+                    <div style={{position:"relative", width:"100%"}}>
+                      <div className='remove_i_prev'>
+                        <button onClick={() => setMediaPreview(null)} style={{position:"absolute", right: -10, top: -10, background:"#fff", borderRadius:50, width:35, height:35}}>
+                          <i className='bi bi-x' style={{fontSize:"1.2rem", display:"flex", justifyContent:"center", alignItems: "center", fontWeight: 800}}></i>
+                        </button>
+                      </div>
+                      <img src={mediaPreview} alt="message media" />
+                    </div>
+                  </div>
                 </div>
-              </div>}
+              }
               
               <div className="messagecontent">
                 <div className="emoji">
@@ -464,7 +482,7 @@ export const MainViewChat = ({
       <div className="preview_image_click">
           <div className="actions">
               <div className="download cls">
-                  <a href="#" title="chattify image" download={`http://localhost:8000${previewImage}/`}>
+                  <a href="#" title="chattify image" download={`${BASE_URL}${previewImage}/`}>
                       <button role="button" aria-label="download" >
                           <i className="bi bi-download"></i>
                       </button>
@@ -479,9 +497,9 @@ export const MainViewChat = ({
           </div>
           <div className="pre_image">
             {previewImage.match(/\.(jpeg|jpg|png|svg|gif)$/i) ? (
-              <img src={`http://localhost:8000${previewImage}/`} alt="image" />
+              <img src={`${BASE_URL}${previewImage}/`} alt="image" />
             ) : (
-              <video controls src={`http://localhost:8000${previewImage}/`}></video>
+              <video controls src={`${BASE_URL}${previewImage}/`}></video>
             )}
               
           </div>
